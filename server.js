@@ -3,8 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import bcrypt from "bcryptjs";
-import Admin from "./models/Admin.js";
 
 dotenv.config();
 connectDB();
@@ -21,17 +19,3 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-const createAdmin = async () => {
-  const exists = await Admin.findOne({ username: "admin" });
-  if (!exists) {
-    const hashedPassword = await bcrypt.hash("admin123", 10);
-    await Admin.create({
-      username: "admin",
-      password: hashedPassword,
-    });
-    console.log("Admin created");
-  }
-};
-
-createAdmin();
