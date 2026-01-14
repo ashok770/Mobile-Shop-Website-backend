@@ -6,6 +6,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import bcrypt from "bcryptjs";
 import Admin from "./models/Admin.js";
 import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Mobile Shop API running...");
