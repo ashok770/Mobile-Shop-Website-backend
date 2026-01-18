@@ -1,5 +1,5 @@
 import Product from "../models/Product.js";
-
+import cloudinary from "../config/cloudinary.js";
 // CREATE product
 export const createProduct = async (req, res) => {
   try {
@@ -34,16 +34,37 @@ export const getProducts = async (req, res) => {
 // UPDATE product
 export const updateProduct = async (req, res) => {
   try {
-    const updates = req.body;
-    if (req.file) updates.image = req.file.path;
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-    const updated = await Product.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-    });
+    // If new image uploaded → delete old image
+    if (req.file && product.image) {
+      const publicId = product.image
+        .split("/")
+        .slice(-2)
+        .join("/")
+        .split(".")[0];
 
-    res.json(updated);
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // Update fields
+    product.name = req.body.name || product.name;
+    product.price = req.body.price || product.price;
+    product.brand = req.body.brand || product.brand;
+    product.category = req.body.category || product.category;
+
+    if (req.file) {
+      product.image = req.file.path;
+    }
+
+    await product.save();
+    res.json(product);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: "Product update failed" });
   }
 };
 
