@@ -3,21 +3,38 @@ import cloudinary from "../config/cloudinary.js";
 // CREATE product
 export const createProduct = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+    const {
+      name,
+      brand,
+      category,
+      originalPrice,
+      discountPercent = 0,
+      offerType = "NONE",
+    } = req.body;
 
-    const product = await Product.create({
-      name: req.body.name,
-      price: req.body.price,
-      category: req.body.category,
-      brand: req.body.brand,
-      image: req.file ? req.file.path : "",
+    if (!name || !category || !originalPrice) {
+      return res.status(400).json({ message: "Required fields missing" });
+    }
+
+    // 🔹 Calculate final price
+    const finalPrice =
+      originalPrice - (originalPrice * discountPercent) / 100;
+
+    const product = new Product({
+      name,
+      brand,
+      category,
+      originalPrice,
+      discountPercent,
+      finalPrice,
+      offerType,
+      image: req.file?.path,
     });
 
+    await product.save();
     res.status(201).json(product);
   } catch (error) {
-    console.error("CREATE PRODUCT ERROR:", error);
-    res.status(500).json({ message: "Product creation failed" });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -39,22 +56,27 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // If new image uploaded → delete old image
-    if (req.file && product.image) {
-      const publicId = product.image
-        .split("/")
-        .slice(-2)
-        .join("/")
-        .split(".")[0];
+    const {
+      name,
+      brand,
+      category,
+      originalPrice,
+      discountPercent = 0,
+      offerType = "NONE",
+    } = req.body;
 
-      await cloudinary.uploader.destroy(publicId);
-    }
+    // Calculate final price
+    const finalPrice =
+      originalPrice - (originalPrice * discountPercent) / 100;
 
     // Update fields
-    product.name = req.body.name || product.name;
-    product.price = req.body.price || product.price;
-    product.brand = req.body.brand || product.brand;
-    product.category = req.body.category || product.category;
+    product.name = name || product.name;
+    product.brand = brand || product.brand;
+    product.category = category || product.category;
+    product.originalPrice = originalPrice || product.originalPrice;
+    product.discountPercent = discountPercent;
+    product.finalPrice = finalPrice;
+    product.offerType = offerType;
 
     if (req.file) {
       product.image = req.file.path;
