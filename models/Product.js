@@ -39,6 +39,13 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🔹 Inventory
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
     // 🔹 Offers (Admin controlled)
     offerType: {
       type: String,

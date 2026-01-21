@@ -10,6 +10,7 @@ export const createProduct = async (req, res) => {
       originalPrice,
       discountPercent = 0,
       offerType = "NONE",
+      stock = 0,
     } = req.body;
 
     if (!name || !category || !originalPrice) {
@@ -29,6 +30,7 @@ export const createProduct = async (req, res) => {
       finalPrice,
       offerType,
       image: req.file?.path,
+      stock: Number(stock) || 0,
     });
 
     await product.save();
@@ -63,6 +65,7 @@ export const updateProduct = async (req, res) => {
       originalPrice,
       discountPercent = 0,
       offerType = "NONE",
+      stock,
     } = req.body;
 
     // Calculate final price
@@ -77,6 +80,9 @@ export const updateProduct = async (req, res) => {
     product.discountPercent = discountPercent;
     product.finalPrice = finalPrice;
     product.offerType = offerType;
+    if (typeof stock !== "undefined") {
+      product.stock = Number(stock) || 0;
+    }
 
     if (req.file) {
       product.image = req.file.path;
