@@ -17,9 +17,17 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
+    if (!req.files || req.files.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "At least one image is required" });
+    }
+
+    // 🔹 Collect image URLs from uploaded files
+    const imageUrls = req.files.map((file) => file.path);
+
     // 🔹 Calculate final price
-    const finalPrice =
-      originalPrice - (originalPrice * discountPercent) / 100;
+    const finalPrice = originalPrice - (originalPrice * discountPercent) / 100;
 
     const product = new Product({
       name,
@@ -29,7 +37,8 @@ export const createProduct = async (req, res) => {
       discountPercent,
       finalPrice,
       offerType,
-      image: req.file?.path,
+      images: imageUrls,
+      image: imageUrls[0], // Keep for backward compatibility
       stock: Number(stock) || 0,
     });
 
@@ -69,8 +78,7 @@ export const updateProduct = async (req, res) => {
     } = req.body;
 
     // Calculate final price
-    const finalPrice =
-      originalPrice - (originalPrice * discountPercent) / 100;
+    const finalPrice = originalPrice - (originalPrice * discountPercent) / 100;
 
     // Update fields
     product.name = name || product.name;
@@ -84,8 +92,10 @@ export const updateProduct = async (req, res) => {
       product.stock = Number(stock) || 0;
     }
 
-    if (req.file) {
-      product.image = req.file.path;
+    if (req.files && req.files.length > 0) {
+      const imageUrls = req.files.map((file) => file.path);
+      product.images = imageUrls;
+      product.image = imageUrls[0]; // Keep for backward compatibility
     }
 
     await product.save();

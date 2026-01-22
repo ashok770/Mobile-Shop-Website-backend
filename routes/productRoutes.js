@@ -20,15 +20,15 @@ router.get("/offers/:type", async (req, res) => {
   const { type } = req.params;
 
   const products = await Product.find({
-    offerType: type
+    offerType: type,
   });
 
   res.json(products);
 });
 
 // Admin
-router.post("/", protect, upload.single("image"), createProduct);
-router.put("/:id", protect, upload.single("image"), updateProduct);
+router.post("/", protect, upload.array("images", 5), createProduct);
+router.put("/:id", protect, upload.array("images", 5), updateProduct);
 router.delete("/:id", protect, deleteProduct);
 
 export default router;
