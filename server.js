@@ -26,28 +26,44 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 /**
- * Dark-pattern heuristics for lab / demo (time-based + countdown).
- * Pass visible page text (or innerText snapshot); returns matched labels.
+ * Dark-pattern heuristics (demo / extension lab). Pass visible page text.
  */
 function detectDarkPatternsFromText(text) {
   if (!text || typeof text !== "string") {
     return [];
   }
 
-  const lowerText = text.toLowerCase();
   const patterns = [];
+  const lowerText = text.toLowerCase();
 
+  // Fake urgency (stock pressure)
+  if (
+    lowerText.includes("only") &&
+    (lowerText.includes("left") || lowerText.includes("stock"))
+  ) {
+    patterns.push("⚠️ Fake Scarcity");
+  }
+
+  // Time pressure
   if (
     lowerText.includes("offer ends") ||
     lowerText.includes("limited time") ||
-    lowerText.includes("hurry") ||
-    lowerText.includes("ending soon")
+    lowerText.includes("hurry")
   ) {
     patterns.push("⚠️ Fake Urgency");
   }
 
+  // Countdown timer (regex)
   if (/\d{1,2}:\d{2}/.test(lowerText)) {
     patterns.push("⚠️ Countdown Timer Pressure");
+  }
+
+  // Social pressure
+  if (
+    lowerText.includes("people are viewing") ||
+    lowerText.includes("people viewing")
+  ) {
+    patterns.push("⚠️ Social Pressure");
   }
 
   return patterns;
