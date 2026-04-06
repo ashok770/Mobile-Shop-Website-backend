@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import chatbotRoutes from "./routes/chatRoutes.js";
 
 // Init app
 const app = express();
@@ -24,6 +25,7 @@ connectDB();
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("api/chat", chatbotRoutes);
 
 // Test route
 app.get("/", (req, res) => {
