@@ -11,13 +11,11 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 
 // Init app
-const esewaRoutes = require("./routes/esewaRoutes.js");
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
-app.use("/api/esewa", esewaRoutes);
 
 // Database
 connectDB();
