@@ -22,20 +22,25 @@ router.post("/", async (req, res) => {
                 ? `, offer: ${product.offerType}`
                 : "";
             const brand = product.brand ? `${product.brand}` : "Unknown brand";
-            return `- ${product.name} (${product.category}) by ${brand} — ₹${product.finalPrice}${offer}`;
+            return `- ${product.name} (${product.category}) by ${brand} — ₹${product.finalPrice}
+Link: http://localhost:5173/mobiles/${product._id}`;
           })
           .join("\n")
       : "No products currently available.";
 
-    const prompt = `You are a helpful assistant for the Mobile Shop website. Use the website product catalog and public pages to answer user questions accurately. Do not mention admin pages or backend details.
+    const prompt = `You are a helpful assistant for the Mobile Shop website.
 
-Website pages: Home, Mobiles, Accessories, Services, Contact, Order.
+When recommending products:
+- Always include product name
+- Include price
+- Include the provided link
 
 Product catalog:
 ${productSummary}
 
 User: ${message}
-Reply in a short, helpful way, and reference actual products when relevant.`;
+
+Reply in a clean list format.`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
