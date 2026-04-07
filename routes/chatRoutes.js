@@ -7,6 +7,19 @@ router.post("/", async (req, res) => {
   try {
     const { message } = req.body;
 
+    if (message.toLowerCase().includes("under")) {
+      const products = await Product.find({ finalPrice: { $lt: 20000 } }).limit(5);
+
+      return res.json({
+        type: "products",
+        products: products.map((p) => ({
+          name: p.name,
+          price: p.finalPrice,
+          link: `http://localhost:5173/mobiles/${p._id}`,
+        })),
+      });
+    }
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     const products = await Product.find({})
