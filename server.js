@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import cookieParser from "cookie-parser";
 
 // Routes
 import adminRoutes from "./routes/adminRoutes.js";
@@ -18,6 +19,7 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Database
 connectDB();
