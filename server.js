@@ -13,6 +13,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import chatbotRoutes from "./routes/chatRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 // Init app
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/chat", chatbotRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/profile", profileRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.send("Mobile Shop API running");
