@@ -14,6 +14,7 @@ import chatbotRoutes from "./routes/chatRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import wishlistRoutes from "./routes/wishlistRoutes.js";
 
 // Init app
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/chat", chatbotRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.send("Mobile Shop API running");
