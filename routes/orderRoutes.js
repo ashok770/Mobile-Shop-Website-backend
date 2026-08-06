@@ -2,6 +2,8 @@ import express from "express";
 import {
   createOrder,
   getOrders,
+  getMyOrders,
+  getOrderById,
   updateOrderStatus,
 } from "../controllers/orderController.js";
 import protect from "../middleware/authMiddleware.js";
@@ -9,8 +11,14 @@ import Order from "../models/Order.js";
 
 const router = express.Router();
 
-// Public
-router.post("/", createOrder);
+// Protected - logged-in users only
+router.post("/", protect, createOrder);
+
+// GET logged-in user's orders
+router.get("/my-orders", protect, getMyOrders);
+
+// GET single order (logged-in user's own order)
+router.get("/:id", protect, getOrderById);
 
 // Admin only
 router.get("/", protect, getOrders);
@@ -42,20 +50,17 @@ router.get("/stats/admin", protect, async (req, res) => {
 
   const totalOrders = orders.length;
   const pendingOrders = orders.filter(
-    (o) => o.orderStatus === "Pending"
+    (o) => o.orderStatus === "Pending",
   ).length;
 
-  const deliveredOrders = orders.filter(
-    (o) => o.orderStatus === "Delivered"
-  );
+  const deliveredOrders = orders.filter((o) => o.orderStatus === "Delivered");
 
   const totalRevenue = deliveredOrders.reduce((sum, order) => {
     return (
       sum +
       order.items.reduce(
-        (itemSum, item) =>
-          itemSum + item.price * item.quantity,
-        0
+        (itemSum, item) => itemSum + item.price * item.quantity,
+        0,
       )
     );
   }, 0);

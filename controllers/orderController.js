@@ -1,7 +1,7 @@
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 
-// CREATE order (Public)
+// CREATE order (Protected - logged-in users only)
 export const createOrder = async (req, res) => {
   try {
     const { items } = req.body;
@@ -31,7 +31,7 @@ export const createOrder = async (req, res) => {
         const upd = await Product.findOneAndUpdate(
           { _id: item.productId, stock: { $gte: item.quantity } },
           { $inc: { stock: -item.quantity } },
-          { new: true }
+          { new: true },
         );
 
         if (!upd) {
@@ -39,7 +39,9 @@ export const createOrder = async (req, res) => {
           for (const u of updated) {
             await Product.findByIdAndUpdate(u._id, { $inc: { stock: u.qty } });
           }
-          return res.status(400).json({ message: "Stock validation failed during update" });
+          return res
+            .status(400)
+            .json({ message: "Stock validation failed during update" });
         }
 
         updated.push({ _id: upd._id, qty: item.quantity });
@@ -53,9 +55,28 @@ export const createOrder = async (req, res) => {
     }
 
     // 3) Save order
-    const order = new Order(req.body);
-    await order.save();
-    res.status(201).json(order);
+    const order = await Order.create({
+      user: req.user._id,
+
+      customerName: req.body.customerName,
+      phone: req.body.phone,
+      address: req.body.address,
+
+      items: req.body.items,
+
+      subtotal: req.body.subtotal,
+      shippingCharge: req.body.shippingCharge || 0,
+      totalAmount: req.body.totalAmount,
+
+      paymentMethod: req.body.paymentMethod,
+      paymentStatus: "Pending",
+      orderStatus: "Pending",
+    });
+
+    res.status(201).json({
+      success: true,
+      order,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -68,13 +89,62 @@ export const getOrders = async (req, res) => {
   res.json(orders);
 };
 
+// GET logged-in user's orders
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      user: req.user._id,
+    }).sort({
+      createdAt: -1,
+    });
+
+    res.json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// GET single order
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 // UPDATE order status (Admin only)
 export const updateOrderStatus = async (req, res) => {
   try {
     const updated = await Order.findByIdAndUpdate(
       req.params.id,
       { orderStatus: req.body.orderStatus },
-      { new: true }
+      { new: true },
     );
     res.json(updated);
   } catch (error) {
