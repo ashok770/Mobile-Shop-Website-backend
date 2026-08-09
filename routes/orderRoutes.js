@@ -5,13 +5,15 @@ import {
   getMyOrders,
   getOrderById,
   updateOrderStatus,
+  getOrderStats,
 } from "../controllers/orderController.js";
-import protect from "../middleware/authMiddleware.js";
-import Order from "../models/Order.js";
+import protect, { adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Protected - logged-in users only
+// ===== Customer endpoints (protect only) =====
+
+// POST create order (logged-in users only)
 router.post("/", protect, createOrder);
 
 // GET logged-in user's orders
@@ -20,57 +22,15 @@ router.get("/my-orders", protect, getMyOrders);
 // GET single order (logged-in user's own order)
 router.get("/:id", protect, getOrderById);
 
-// Admin only
-router.get("/", protect, getOrders);
-router.put("/:id", protect, updateOrderStatus);
+// ===== Admin endpoints (protect + adminOnly) =====
 
-// Update order status (Admin)
-router.put("/:id/status", protect, async (req, res) => {
-  const { orderStatus } = req.body;
+// GET all orders (Admin only)
+router.get("/", protect, adminOnly, getOrders);
 
-  try {
-    const order = await Order.findById(req.params.id);
+// GET admin stats (Admin only)
+router.get("/stats/admin", protect, adminOnly, getOrderStats);
 
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    order.orderStatus = orderStatus;
-    await order.save();
-
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// GET admin stats
-router.get("/stats/admin", protect, async (req, res) => {
-  const orders = await Order.find();
-
-  const totalOrders = orders.length;
-  const pendingOrders = orders.filter(
-    (o) => o.orderStatus === "Pending",
-  ).length;
-
-  const deliveredOrders = orders.filter((o) => o.orderStatus === "Delivered");
-
-  const totalRevenue = deliveredOrders.reduce((sum, order) => {
-    return (
-      sum +
-      order.items.reduce(
-        (itemSum, item) => itemSum + item.price * item.quantity,
-        0,
-      )
-    );
-  }, 0);
-
-  res.json({
-    totalOrders,
-    pendingOrders,
-    deliveredOrders: deliveredOrders.length,
-    totalRevenue,
-  });
-});
+// PUT update order status (Admin only)
+router.put("/:id/status", protect, adminOnly, updateOrderStatus);
 
 export default router;

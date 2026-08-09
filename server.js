@@ -3,6 +3,8 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import connectDB from "./config/db.js";
 import cookieParser from "cookie-parser";
 
@@ -15,13 +17,70 @@ import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
+import addressRoutes from "./routes/addressRoutes.js";
 
 // Init app
 const app = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
+// Security middleware
+app.use(helmet());
+
+// CORS - restrict to known origins
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
+  : ["http://localhost:5173", "http://localhost:3000"];
+
+// In development, allow any localhost origin regardless of port
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const url = new URL(origin);
+    const isLocalhost =
+      url.hostname === "localhost" ||
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "::1";
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    // Allow any localhost origin during development
+    if (!isProduction && isLocalhost) return true;
+
+    return false;
+  } catch {
+    return false;
+  }
+};
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (isAllowedOrigin(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
+
+// Global rate limit
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // 300 requests per 15 min per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests, please try again later.",
+  },
+});
+
+app.use(globalLimiter);
+
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
 // Database
@@ -36,9 +95,35 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/address", addressRoutes);
+
 // Test route
 app.get("/", (req, res) => {
   res.send("Mobile Shop API running");
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
+
+// Centralized error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+
+  if (err.message === "Not allowed by CORS") {
+    return res
+      .status(403)
+      .json({ success: false, message: "Not allowed by CORS" });
+  }
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
 // Start server

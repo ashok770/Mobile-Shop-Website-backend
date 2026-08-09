@@ -2,11 +2,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Basic Validation
+    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -14,8 +16,29 @@ export const register = async (req, res) => {
       });
     }
 
+    if (name.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must be at least 2 characters long.",
+      });
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address.",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long.",
+      });
+    }
+
     // Check Existing User
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
 
     if (existingUser) {
       return res.status(409).json({
@@ -29,8 +52,8 @@ export const register = async (req, res) => {
 
     // Create User
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: email.toLowerCase(),
       password: hashedPassword,
     });
 
@@ -45,6 +68,14 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("Register Error:", error);
+
+    // Handle duplicate key error (race condition)
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists with this email.",
+      });
+    }
 
     return res.status(500).json({
       success: false,
@@ -66,7 +97,9 @@ export const login = async (req, res) => {
     }
 
     // Get user (password is hidden by select:false)
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email: email.toLowerCase() }).select(
+      "+password",
+    );
 
     if (!user) {
       return res.status(401).json({
@@ -117,6 +150,7 @@ export const login = async (req, res) => {
     });
   }
 };
+
 export const getCurrentUser = async (req, res) => {
   try {
     return res.status(200).json({

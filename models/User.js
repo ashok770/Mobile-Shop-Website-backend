@@ -6,36 +6,43 @@ const addressSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 2,
+      maxlength: 100,
     },
 
     phone: {
       type: String,
       required: true,
       trim: true,
+      match: [/^[6-9]\d{9}$/, "Please provide a valid 10-digit phone number"],
     },
 
     street: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 200,
     },
 
     city: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
 
     state: {
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
 
     pincode: {
       type: String,
       required: true,
       trim: true,
+      match: [/^\d{6}$/, "Pincode must be a valid 6-digit number"],
     },
 
     isDefault: {
@@ -64,6 +71,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email"],
     },
 
     password: {
@@ -97,6 +105,9 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+// Index for faster lookups
+userSchema.index({ role: 1 });
 
 const User = mongoose.model("User", userSchema);
 

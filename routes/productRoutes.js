@@ -6,7 +6,7 @@ import {
   deleteProduct,
 } from "../controllers/productController.js";
 
-import protect from "../middleware/authMiddleware.js";
+import protect, { adminOnly } from "../middleware/authMiddleware.js";
 import upload from "../middleware/upload.js";
 import Product from "../models/Product.js";
 
@@ -26,9 +26,15 @@ router.get("/offers/:type", async (req, res) => {
   res.json(products);
 });
 
-// Admin
-router.post("/", protect, upload.array("images", 5), createProduct);
-router.put("/:id", protect, upload.array("images", 5), updateProduct);
-router.delete("/:id", protect, deleteProduct);
+// Admin (protect + adminOnly)
+router.post("/", protect, adminOnly, upload.array("images", 5), createProduct);
+router.put(
+  "/:id",
+  protect,
+  adminOnly,
+  upload.array("images", 5),
+  updateProduct,
+);
+router.delete("/:id", protect, adminOnly, deleteProduct);
 
 export default router;
