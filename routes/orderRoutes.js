@@ -7,7 +7,7 @@ import {
   updateOrderStatus,
   getOrderStats,
 } from "../controllers/orderController.js";
-import protect, { adminOnly } from "../middleware/authMiddleware.js";
+import protect, { adminOnly, adminProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -22,15 +22,15 @@ router.get("/my-orders", protect, getMyOrders);
 // GET single order (logged-in user's own order)
 router.get("/:id", protect, getOrderById);
 
-// ===== Admin endpoints (protect + adminOnly) =====
+// ===== Admin endpoints (adminProtect + adminOnly) =====
 
 // GET all orders (Admin only)
-router.get("/", protect, adminOnly, getOrders);
+router.get("/", adminProtect, adminOnly, getOrders);
 
 // GET admin stats (Admin only)
-router.get("/stats/admin", protect, adminOnly, getOrderStats);
+router.get("/stats/admin", adminProtect, adminOnly, getOrderStats);
 
 // PUT update order status (Admin only)
-router.put("/:id/status", protect, adminOnly, updateOrderStatus);
+router.put("/:id/status", adminProtect, adminOnly, updateOrderStatus);
 
 export default router;
