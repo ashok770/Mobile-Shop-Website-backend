@@ -1,8 +1,29 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 import User from "../models/User.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const googleClient = new OAuth2Client();
+
+const createAuthToken = (user) =>
+  jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
+
+const serializeUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+});
 
 export const register = async (req, res) => {
   try {
@@ -38,12 +59,16 @@ export const register = async (req, res) => {
     }
 
     // Check Existing User
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: email.toLowerCase() }).select(
+      "+password",
+    );
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "User already exists with this email.",
+        message: existingUser.googleId && !existingUser.password
+          ? "An account with this email uses Google Sign-In. Please continue with Google."
+          : "User already exists with this email.",
       });
     }
 
@@ -109,6 +134,13 @@ export const login = async (req, res) => {
     }
 
     // Compare Password
+    if (!user.password) {
+      return res.status(401).json({
+        success: false,
+        message: "This account uses Google Sign-In. Please continue with Google.",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -118,32 +150,108 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate JWT
-    const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
-    );
+    const token = createAuthToken(user);
 
     return res.status(200).json({
       success: true,
       message: "Login successful.",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      user: serializeUser(user),
     });
   } catch (error) {
     console.error("Login Error:", error);
 
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const googleLogin = async (req, res) => {
+  const { credential } = req.body || {};
+
+  if (typeof credential !== "string" || !credential.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Google credential is required.",
+    });
+  }
+
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.error("Google Sign-In is not configured: GOOGLE_CLIENT_ID is missing.");
+    return res.status(500).json({
+      success: false,
+      message: "Google Sign-In is not configured.",
+    });
+  }
+
+  let payload;
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    console.error("Google credential verification failed:", error.message);
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired Google credential.",
+    });
+  }
+
+  try {
+    const googleId = payload?.sub;
+    const email = payload?.email?.toLowerCase().trim();
+
+    if (!googleId || !email || payload.email_verified !== true) {
+      return res.status(401).json({
+        success: false,
+        message: "Google account email could not be verified.",
+      });
+    }
+
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      user = await User.findOne({ email });
+
+      if (user) {
+        user.googleId = googleId;
+        user.emailVerified = true;
+        await user.save();
+      } else {
+        const trustedName = payload.name?.trim() || email.split("@")[0];
+        user = await User.create({
+          name: trustedName.length >= 2 ? trustedName : "Google User",
+          email,
+          avatar: payload.picture || "",
+          googleId,
+          emailVerified: true,
+          role: "customer",
+        });
+      }
+    }
+
+    const token = createAuthToken(user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Google Sign-In successful.",
+      token,
+      user: serializeUser(user),
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "This Google account is already linked to another user.",
+      });
+    }
+
+    console.error("Google Sign-In database error:", error.message);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

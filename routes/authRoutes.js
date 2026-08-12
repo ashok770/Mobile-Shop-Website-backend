@@ -4,6 +4,7 @@ import protect from "../middleware/authMiddleware.js";
 import {
   register,
   login,
+  googleLogin,
   getCurrentUser,
 } from "../controllers/authController.js";
 
@@ -23,6 +24,7 @@ const authLimiter = rateLimit({
 
 router.post("/register", authLimiter, register);
 router.post("/login", authLimiter, login);
+router.post("/google", authLimiter, googleLogin);
 router.get("/me", protect, getCurrentUser);
 
 export default router;
