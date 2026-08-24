@@ -5,6 +5,40 @@ import User from "../models/User.js";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const googleClient = new OAuth2Client();
+const googleClientId = (process.env.GOOGLE_CLIENT_ID || "").trim();
+
+const getGoogleVerificationFailureCategory = (error) => {
+  // This value is used only for classification and is never logged or returned.
+  const message = typeof error?.message === "string" ? error.message.toLowerCase() : "";
+
+  if (message.includes("failed to retrieve verification certificates")) {
+    return "certificate_fetch_failed";
+  }
+  if (message.includes("wrong recipient") || message.includes("audience")) {
+    return "audience_mismatch";
+  }
+  if (message.includes("token used too late") || message.includes("token expired")) {
+    return "token_expired";
+  }
+  if (message.includes("invalid issuer") || message.includes("issuer mismatch")) {
+    return "issuer_mismatch";
+  }
+  if (message.includes("invalid token signature")) {
+    return "signature_invalid";
+  }
+  if (
+    message.includes("wrong number of segments") ||
+    message.includes("can't parse token") ||
+    message.includes("invalid format") ||
+    message.includes("no issue time") ||
+    message.includes("no expiration time") ||
+    message.includes("expiration time too far in future")
+  ) {
+    return "malformed_token";
+  }
+
+  return "unknown_verification_error";
+};
 
 const createAuthToken = (user) =>
   jwt.sign(
@@ -178,8 +212,8 @@ export const googleLogin = async (req, res) => {
     });
   }
 
-  if (!process.env.GOOGLE_CLIENT_ID) {
-    console.error("Google Sign-In is not configured: GOOGLE_CLIENT_ID is missing.");
+  if (!googleClientId) {
+    console.error("Google authentication verification failed: missing_configuration");
     return res.status(500).json({
       success: false,
       message: "Google Sign-In is not configured.",
@@ -191,11 +225,12 @@ export const googleLogin = async (req, res) => {
   try {
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: googleClientId,
     });
     payload = ticket.getPayload();
   } catch (error) {
-    console.error("Google credential verification failed:", error.message);
+    const category = getGoogleVerificationFailureCategory(error);
+    console.error(`Google authentication verification failed: ${category}`);
     return res.status(401).json({
       success: false,
       message: "Invalid or expired Google credential.",

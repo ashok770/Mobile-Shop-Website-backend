@@ -22,6 +22,10 @@ import addressRoutes from "./routes/addressRoutes.js";
 // Init app
 const app = express();
 
+// Render sends requests through one public reverse-proxy hop. Trusting exactly
+// that hop lets Express use the client address from X-Forwarded-For safely.
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(helmet());
 
