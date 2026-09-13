@@ -62,12 +62,27 @@ export const adminProtect = async (req, res, next) => {
         });
       }
 
+      if (decoded.tokenVersion === undefined || decoded.tokenVersion === null) {
+        return res.status(401).json({
+          success: false,
+          message: "Not authorized, admin token failed",
+        });
+      }
+
       req.admin = await Admin.findById(decoded.id).select("-password");
 
       if (!req.admin) {
         return res.status(401).json({
           success: false,
           message: "Admin account no longer exists.",
+        });
+      }
+
+      const currentVersion = req.admin.tokenVersion ?? 0;
+      if (decoded.tokenVersion !== currentVersion) {
+        return res.status(401).json({
+          success: false,
+          message: "Not authorized, admin token failed",
         });
       }
 

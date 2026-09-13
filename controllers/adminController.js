@@ -18,7 +18,11 @@ export const adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: admin._id, type: "admin" },
+      {
+        id: admin._id,
+        type: "admin",
+        tokenVersion: admin.tokenVersion ?? 0,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
@@ -29,5 +33,28 @@ export const adminLogin = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Admin Logout
+export const adminLogout = async (req, res) => {
+  try {
+    if (!req.admin || !req.admin._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, admin token failed",
+      });
+    }
+
+    await Admin.findByIdAndUpdate(req.admin._id, {
+      $inc: { tokenVersion: 1 },
+    });
+
+    return res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
