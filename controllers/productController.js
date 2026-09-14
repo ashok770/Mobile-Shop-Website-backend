@@ -73,7 +73,26 @@ export const createProduct = async (req, res) => {
 // GET all products
 export const getProducts = async (req, res) => {
   try {
-    const { page, limit } = req.query;
+    const { page, limit, search, brand, category, status, offerType, stock } = req.query;
+
+    let filter = {};
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (brand) filter.brand = brand;
+    if (category) filter.category = category;
+    if (status) filter.status = status;
+    if (offerType) filter.offerType = offerType;
+    
+    if (stock) {
+      if (stock === "in_stock") filter.stock = { $gt: 5 };
+      else if (stock === "low_stock") filter.stock = { $gt: 0, $lte: 5 };
+      else if (stock === "out_of_stock") filter.stock = 0;
+    }
 
     if (page || limit) {
       const pageNum = Math.max(1, parseInt(page, 10) || 1);
@@ -81,8 +100,8 @@ export const getProducts = async (req, res) => {
       const skip = (pageNum - 1) * limitNum;
 
       const [products, total] = await Promise.all([
-        Product.find().sort({ createdAt: -1 }).skip(skip).limit(limitNum),
-        Product.countDocuments(),
+        Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+        Product.countDocuments(filter),
       ]);
 
       return res.json({
@@ -97,7 +116,7 @@ export const getProducts = async (req, res) => {
     }
 
     // Backward compatible standard request
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
