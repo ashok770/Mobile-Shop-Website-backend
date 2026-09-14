@@ -2,6 +2,7 @@ import express from "express";
 import {
   createProduct,
   getProducts,
+  getProductById,
   updateProduct,
   deleteProduct,
 } from "../controllers/productController.js";
@@ -25,6 +26,9 @@ router.get("/offers/:type", async (req, res) => {
 
   res.json(products);
 });
+
+// GET single product by ID
+router.get("/:id", getProductById);
 
 // Admin (adminProtect + adminOnly)
 router.post("/", adminProtect, adminOnly, upload.array("images", 5), createProduct);

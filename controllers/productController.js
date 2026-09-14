@@ -51,7 +51,7 @@ export const createProduct = async (req, res) => {
     const product = new Product({
       name,
       brand,
-      category,
+      category: category ? category.toLowerCase() : category,
       description: description || "",
       status: status || "ACTIVE",
       originalPrice: origPriceNum,
@@ -123,6 +123,19 @@ export const getProducts = async (req, res) => {
   }
 };
 
+// GET product by ID
+export const getProductById = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // UPDATE product
 export const updateProduct = async (req, res) => {
   try {
@@ -169,7 +182,7 @@ export const updateProduct = async (req, res) => {
     // Update fields
     if (name) product.name = name;
     if (brand !== undefined) product.brand = brand;
-    if (category) product.category = category;
+    if (category) product.category = category.toLowerCase();
     if (description !== undefined) product.description = description;
     if (status) product.status = status;
     if (offerType) product.offerType = offerType;
@@ -179,11 +192,34 @@ export const updateProduct = async (req, res) => {
     product.finalPrice = finalPrice;
     product.stock = stockNum;
 
-    if (req.files && req.files.length > 0) {
-      const imageUrls = req.files.map((file) => file.path);
-      product.images = imageUrls;
-      product.image = imageUrls[0]; // Keep for backward compatibility
+    // Image handling: combine retained existing images + newly uploaded images
+    let retainedImages = [];
+    if (req.body.retainedImages !== undefined) {
+      if (Array.isArray(req.body.retainedImages)) {
+        retainedImages = req.body.retainedImages;
+      } else if (typeof req.body.retainedImages === "string") {
+        try {
+          retainedImages = JSON.parse(req.body.retainedImages);
+        } catch (e) {
+          retainedImages = [req.body.retainedImages];
+        }
+      }
+    } else if (!req.files || req.files.length === 0) {
+      retainedImages = product.images || [];
     }
+
+    const newUploadedUrls = req.files ? req.files.map((file) => file.path) : [];
+    const finalImages = [...retainedImages, ...newUploadedUrls];
+
+    if (finalImages.length === 0) {
+      return res.status(400).json({ message: "At least one image is required" });
+    }
+    if (finalImages.length > 5) {
+      return res.status(400).json({ message: "Maximum 5 images allowed" });
+    }
+
+    product.images = finalImages;
+    product.image = finalImages[0];
 
     await product.save();
     res.json(product);
