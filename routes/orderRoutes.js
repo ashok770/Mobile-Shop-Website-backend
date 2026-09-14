@@ -7,11 +7,11 @@ import {
   updateOrderStatus,
   getOrderStats,
 } from "../controllers/orderController.js";
-import protect, { adminOnly, adminProtect } from "../middleware/authMiddleware.js";
+import protect, { adminOnly, adminProtect, optionalAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ===== Customer endpoints (protect only) =====
+// ===== Customer endpoints =====
 
 // POST create order (logged-in users only)
 router.post("/", protect, createOrder);
@@ -19,8 +19,8 @@ router.post("/", protect, createOrder);
 // GET logged-in user's orders
 router.get("/my-orders", protect, getMyOrders);
 
-// GET single order (logged-in user's own order)
-router.get("/:id", protect, getOrderById);
+// GET single order (Customer own order or Admin)
+router.get("/:id", optionalAdmin, protect, getOrderById);
 
 // ===== Admin endpoints (adminProtect + adminOnly) =====
 

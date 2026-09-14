@@ -2,6 +2,57 @@ import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 
+const VALID_STATUSES = [
+  "Pending",
+  "Confirmed",
+  "Packed",
+  "Shipped",
+  "Out for Delivery",
+  "Delivered",
+  "Cancelled",
+];
+
+const VALID_PAYMENT_STATUSES = ["Pending", "Paid", "Failed", "Refunded"];
+
+// V1 State Transition Matrix (Terminal states: Delivered & Cancelled)
+const ALLOWED_TRANSITIONS = {
+  Pending: ["Confirmed", "Cancelled"],
+  Confirmed: ["Packed", "Cancelled"],
+  Packed: ["Shipped", "Cancelled"],
+  Shipped: ["Out for Delivery", "Cancelled"],
+  "Out for Delivery": ["Delivered", "Cancelled"],
+  Delivered: [], // Terminal state in V1
+  Cancelled: [], // Terminal state in V1
+};
+
+/**
+ * Format order response with fallback calculation for 9 legacy orders
+ * that have subtotal, shippingCharge, or totalAmount as undefined.
+ */
+export const formatOrderForResponse = (orderDoc) => {
+  if (!orderDoc) return orderDoc;
+  const obj = typeof orderDoc.toObject === "function" ? orderDoc.toObject() : { ...orderDoc };
+
+  let subtotal = obj.subtotal;
+  if (subtotal === undefined || subtotal === null) {
+    subtotal = (obj.items || []).reduce(
+      (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+      0
+    );
+    obj.subtotal = Math.max(0, Math.round(subtotal * 100) / 100);
+  }
+
+  if (obj.shippingCharge === undefined || obj.shippingCharge === null) {
+    obj.shippingCharge = obj.subtotal > 0 && obj.subtotal < 500 ? 49 : 0;
+  }
+
+  if (obj.totalAmount === undefined || obj.totalAmount === null) {
+    obj.totalAmount = Math.max(0, Math.round((obj.subtotal + obj.shippingCharge) * 100) / 100);
+  }
+
+  return obj;
+};
+
 // CREATE order (Protected - logged-in users only)
 export const createOrder = async (req, res) => {
   try {
@@ -78,7 +129,7 @@ export const createOrder = async (req, res) => {
 
     // Compute totals server-side
     const shippingCharge = subtotal > 0 && subtotal < 500 ? 49 : 0;
-    const totalAmount = subtotal + shippingCharge;
+    const totalAmount = Math.max(0, Math.round((subtotal + shippingCharge) * 100) / 100);
 
     // Reduce stock atomically with bulkWrite (single round-trip)
     const bulkOps = orderItems.map((item) => ({
@@ -105,7 +156,7 @@ export const createOrder = async (req, res) => {
       phone,
       address,
       items: orderItems,
-      subtotal,
+      subtotal: Math.max(0, Math.round(subtotal * 100) / 100),
       shippingCharge,
       totalAmount,
       paymentMethod: paymentMethod === "ONLINE" ? "ONLINE" : "COD",
@@ -115,7 +166,7 @@ export const createOrder = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      order,
+      order: formatOrderForResponse(order),
     });
   } catch (error) {
     console.error("Create order error:", error);
@@ -123,25 +174,104 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// GET all orders (Admin only) - with pagination
+// GET all orders (Admin only) - with hardened search, status/payment filters, date queries, & pagination
 export const getOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 20;
-    const skip = (page - 1) * limit;
+    const {
+      page,
+      limit,
+      search,
+      status,
+      paymentStatus,
+      startDate,
+      endDate,
+    } = req.query;
 
-    const [orders, total] = await Promise.all([
-      Order.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Order.countDocuments(),
-    ]);
+    const filter = {};
+
+    // 1. Search Query Hardening (customerName, phone, or Order ID)
+    const searchVal = Array.isArray(search) ? search[0] : search;
+    if (typeof searchVal === "string" && searchVal.trim().length > 0) {
+      const trimmed = searchVal.trim().slice(0, 100);
+      const sanitized = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+      const searchOr = [
+        { customerName: { $regex: sanitized, $options: "i" } },
+        { phone: { $regex: sanitized, $options: "i" } },
+      ];
+
+      // If valid ObjectId, add exact _id match
+      if (mongoose.Types.ObjectId.isValid(trimmed)) {
+        searchOr.push({ _id: new mongoose.Types.ObjectId(trimmed) });
+      }
+
+      filter.$or = searchOr;
+    }
+
+    // 2. Status Filter Validation
+    const statusVal = Array.isArray(status) ? status[0] : status;
+    if (statusVal && statusVal !== "ALL" && VALID_STATUSES.includes(statusVal)) {
+      filter.orderStatus = statusVal;
+    }
+
+    // 3. Payment Status Filter Validation
+    const payStatusVal = Array.isArray(paymentStatus) ? paymentStatus[0] : paymentStatus;
+    if (payStatusVal && payStatusVal !== "ALL" && VALID_PAYMENT_STATUSES.includes(payStatusVal)) {
+      filter.paymentStatus = payStatusVal;
+    }
+
+    // 4. Date Range Filter
+    const startVal = Array.isArray(startDate) ? startDate[0] : startDate;
+    const endVal = Array.isArray(endDate) ? endDate[0] : endDate;
+    if (startVal || endVal) {
+      filter.createdAt = {};
+      if (startVal && !isNaN(Date.parse(startVal))) {
+        filter.createdAt.$gte = new Date(startVal);
+      }
+      if (endVal && !isNaN(Date.parse(endVal))) {
+        const endD = new Date(endVal);
+        endD.setHours(23, 59, 59, 999);
+        filter.createdAt.$lte = endD;
+      }
+    }
+
+    // 5. Pagination Parsing & Clamping
+    const rawPage = parseInt(Array.isArray(page) ? page[0] : page, 10);
+    const pageNum = isNaN(rawPage) || rawPage <= 0 ? 1 : rawPage;
+
+    const rawLimit = parseInt(Array.isArray(limit) ? limit[0] : limit, 10);
+    const limitNum = isNaN(rawLimit) || rawLimit <= 0 ? 20 : Math.min(100, rawLimit);
+
+    const total = await Order.countDocuments(filter);
+    const totalPages = Math.ceil(total / limitNum) || 1;
+
+    // High page offset optimization
+    if (pageNum > totalPages) {
+      return res.json({
+        success: true,
+        count: 0,
+        total,
+        page: pageNum,
+        totalPages,
+        orders: [],
+      });
+    }
+
+    const skip = (pageNum - 1) * limitNum;
+    const rawOrdersList = await Order.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum);
+
+    const formattedOrders = rawOrdersList.map(formatOrderForResponse);
 
     res.json({
       success: true,
-      count: orders.length,
+      count: formattedOrders.length,
       total,
-      page,
-      totalPages: Math.ceil(total / limit),
-      orders,
+      page: pageNum,
+      totalPages,
+      orders: formattedOrders,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -151,11 +281,13 @@ export const getOrders = async (req, res) => {
 // GET logged-in user's orders
 export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({
+    const rawOrders = await Order.find({
       user: req.user._id,
     }).sort({
       createdAt: -1,
     });
+
+    const orders = rawOrders.map(formatOrderForResponse);
 
     res.json({
       success: true,
@@ -170,22 +302,30 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
-// GET single order
+// GET single order (Hardened ObjectId validation & Admin override support)
 export const getOrderById = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid order ID",
+        message: "Invalid order ID format",
       });
     }
 
-    const order = await Order.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-    });
+    const query = { _id: req.params.id };
 
-    if (!order) {
+    // If caller is NOT admin, constrain to logged-in user's own order
+    const isAdmin = Boolean(req.admin);
+    if (!isAdmin) {
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: "Not authorized" });
+      }
+      query.user = req.user._id;
+    }
+
+    const orderDoc = await Order.findOne(query);
+
+    if (!orderDoc) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
@@ -194,7 +334,7 @@ export const getOrderById = async (req, res) => {
 
     res.json({
       success: true,
-      order,
+      order: formatOrderForResponse(orderDoc),
     });
   } catch (error) {
     res.status(500).json({
@@ -204,9 +344,16 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-// UPDATE order status (Admin only)
+// UPDATE order status (Admin only) - Hardened Transition Matrix & Stock Restoration on Cancellation
 export const updateOrderStatus = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID format",
+      });
+    }
+
     const { orderStatus } = req.body;
 
     if (!orderStatus) {
@@ -215,31 +362,14 @@ export const updateOrderStatus = async (req, res) => {
         .json({ success: false, message: "orderStatus is required" });
     }
 
-    const validStatuses = [
-      "Pending",
-      "Confirmed",
-      "Packed",
-      "Shipped",
-      "Out for Delivery",
-      "Delivered",
-      "Cancelled",
-    ];
-
-    if (!validStatuses.includes(orderStatus)) {
+    if (!VALID_STATUSES.includes(orderStatus)) {
       return res.status(400).json({
         success: false,
-        message: `orderStatus must be one of: ${validStatuses.join(", ")}`,
+        message: `orderStatus must be one of: ${VALID_STATUSES.join(", ")}`,
       });
     }
 
-    const updateFields = { orderStatus };
-
-    // Auto-set deliveredAt when order is delivered
-    if (orderStatus === "Delivered") {
-      updateFields.deliveredAt = new Date();
-    }
-
-    // Auto-set paidAt when order was COD and is delivered
+    // Step 1: Fetch target order document
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res
@@ -247,58 +377,95 @@ export const updateOrderStatus = async (req, res) => {
         .json({ success: false, message: "Order not found" });
     }
 
-    if (orderStatus === "Delivered" && order.paymentMethod === "COD") {
-      updateFields.paymentStatus = "Paid";
-      updateFields.paidAt = new Date();
+    const currentStatus = order.orderStatus;
+
+    // Idempotent check: if status is unchanged, return current order cleanly
+    if (currentStatus === orderStatus) {
+      return res.json({ success: true, order: formatOrderForResponse(order) });
     }
 
+    // Step 2: Validate transition matrix
+    const allowedNext = ALLOWED_TRANSITIONS[currentStatus] || [];
+    if (!allowedNext.includes(orderStatus)) {
+      return res.status(409).json({
+        success: false,
+        message: `Cannot transition order status from '${currentStatus}' to '${orderStatus}'.`,
+      });
+    }
+
+    const updateFields = { orderStatus };
+
+    // Step 3: Auto-updates for Delivered status
+    if (orderStatus === "Delivered") {
+      updateFields.deliveredAt = new Date();
+      if (order.paymentMethod === "COD") {
+        updateFields.paymentStatus = "Paid";
+        updateFields.paidAt = new Date();
+      }
+    }
+
+    // Step 4: Stock Restoration on Cancellation
+    if (orderStatus === "Cancelled" && currentStatus !== "Cancelled") {
+      const validStockItems = (order.items || []).filter(
+        (item) => item.productId && mongoose.Types.ObjectId.isValid(item.productId)
+      );
+
+      if (validStockItems.length > 0) {
+        const restoreOps = validStockItems.map((item) => ({
+          updateOne: {
+            filter: { _id: item.productId },
+            update: { $inc: { stock: Math.max(1, Number(item.quantity) || 1) } },
+          },
+        }));
+
+        try {
+          await Product.bulkWrite(restoreOps);
+          console.log(`[Order Cancelled] Restored stock for ${restoreOps.length} item(s) in Order ${order._id}`);
+        } catch (err) {
+          console.error(`[Order Cancelled] Stock restoration error for Order ${order._id}:`, err.message);
+        }
+      }
+    }
+
+    // Step 5: Update order document
     const updated = await Order.findByIdAndUpdate(
       req.params.id,
       { $set: updateFields },
-      { new: true },
+      { new: true }
     );
 
-    res.json({ success: true, order: updated });
+    res.json({ success: true, order: formatOrderForResponse(updated) });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// GET order stats (Admin only) - aggregation for performance
+// GET order stats (Admin only) - aggregation for performance with legacy total fallbacks
 export const getOrderStats = async (req, res) => {
   try {
-    const [stats] = await Order.aggregate([
-      {
-        $facet: {
-          totals: [{ $group: { _id: null, totalOrders: { $sum: 1 } } }],
-          pending: [
-            { $match: { orderStatus: "Pending" } },
-            { $count: "count" },
-          ],
-          delivered: [
-            { $match: { orderStatus: "Delivered" } },
-            {
-              $group: {
-                _id: null,
-                count: { $sum: 1 },
-                revenue: { $sum: "$totalAmount" },
-              },
-            },
-          ],
-        },
-      },
-    ]);
+    const rawOrders = await Order.find({}).lean();
+    const formattedOrders = rawOrders.map(formatOrderForResponse);
 
-    const totalOrders = stats?.totals?.[0]?.totalOrders || 0;
-    const pendingOrders = stats?.pending?.[0]?.count || 0;
-    const delivered = stats?.delivered?.[0] || { count: 0, revenue: 0 };
+    const totalOrders = formattedOrders.length;
+    let pendingOrders = 0;
+    let deliveredOrders = 0;
+    let totalRevenue = 0;
+
+    formattedOrders.forEach((o) => {
+      if (o.orderStatus === "Pending") {
+        pendingOrders++;
+      } else if (o.orderStatus === "Delivered") {
+        deliveredOrders++;
+        totalRevenue += o.totalAmount || 0;
+      }
+    });
 
     res.json({
       success: true,
       totalOrders,
       pendingOrders,
-      deliveredOrders: delivered.count,
-      totalRevenue: delivered.revenue,
+      deliveredOrders,
+      totalRevenue: Math.max(0, Math.round(totalRevenue * 100) / 100),
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
