@@ -406,9 +406,20 @@ export const updateOrderStatus = async (req, res) => {
 
     // Step 4: Stock Restoration on Cancellation
     if (orderStatus === "Cancelled" && currentStatus !== "Cancelled") {
-      const validStockItems = (order.items || []).filter(
-        (item) => item.productId && mongoose.Types.ObjectId.isValid(item.productId)
-      );
+      const items = order.items || [];
+      const validStockItems = [];
+      const skippedItems = [];
+
+      for (const item of items) {
+        if (item.productId && mongoose.Types.ObjectId.isValid(item.productId)) {
+          validStockItems.push(item);
+        } else {
+          skippedItems.push(item);
+        }
+      }
+
+      let restoredCount = 0;
+      let failedCount = 0;
 
       if (validStockItems.length > 0) {
         const restoreOps = validStockItems.map((item) => ({
@@ -419,11 +430,30 @@ export const updateOrderStatus = async (req, res) => {
         }));
 
         try {
-          await Product.bulkWrite(restoreOps);
-          console.log(`[Order Cancelled] Restored stock for ${restoreOps.length} item(s) in Order ${order._id}`);
+          const bulkResult = await Product.bulkWrite(restoreOps);
+          restoredCount = bulkResult.modifiedCount || 0;
+          failedCount = validStockItems.length - restoredCount;
+
+          console.log(`[Order Cancellation Stock Restoration]`, {
+            orderId: order._id.toString(),
+            totalItems: items.length,
+            validItemsAttempted: validStockItems.length,
+            skippedItemsCount: skippedItems.length,
+            restoredCount,
+            failedCount,
+          });
         } catch (err) {
-          console.error(`[Order Cancelled] Stock restoration error for Order ${order._id}:`, err.message);
+          console.error(`[Order Cancellation Stock Restoration Failed] Order ${order._id}:`, err.message);
         }
+      } else if (skippedItems.length > 0) {
+        console.log(`[Order Cancellation Stock Restoration]`, {
+          orderId: order._id.toString(),
+          totalItems: items.length,
+          validItemsAttempted: 0,
+          skippedItemsCount: skippedItems.length,
+          restoredCount: 0,
+          failedCount: 0,
+        });
       }
     }
 
