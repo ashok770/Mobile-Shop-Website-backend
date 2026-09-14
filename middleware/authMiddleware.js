@@ -24,6 +24,15 @@ const protect = async (req, res, next) => {
         });
       }
 
+      // Enforce accountStatus check for existing active sessions
+      const status = req.user.accountStatus || "ACTIVE";
+      if (status !== "ACTIVE") {
+        return res.status(403).json({
+          success: false,
+          message: "Your account has been disabled or suspended. Please contact customer support.",
+        });
+      }
+
       next();
     } catch (error) {
       return res.status(401).json({

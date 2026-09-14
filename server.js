@@ -18,6 +18,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
+import adminCustomerRoutes from "./routes/adminCustomerRoutes.js";
 
 // Init app
 const app = express();
@@ -91,6 +92,7 @@ app.use(cookieParser());
 connectDB();
 
 // Routes
+app.use("/api/admin/customers", adminCustomerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);

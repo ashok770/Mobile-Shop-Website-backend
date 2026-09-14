@@ -106,6 +106,12 @@ const userSchema = new mongoose.Schema(
       default: "customer",
     },
 
+    accountStatus: {
+      type: String,
+      enum: ["ACTIVE", "DISABLED", "SUSPENDED"],
+      default: "ACTIVE",
+    },
+
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -120,8 +126,10 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-// Index for faster lookups
+// Indexes for faster lookups
 userSchema.index({ role: 1 });
+userSchema.index({ accountStatus: 1 });
+userSchema.index({ createdAt: -1 });
 
 const User = mongoose.model("User", userSchema);
 

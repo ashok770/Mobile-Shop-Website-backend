@@ -184,6 +184,15 @@ export const login = async (req, res) => {
       });
     }
 
+    // Check account status
+    const status = user.accountStatus || "ACTIVE";
+    if (status !== "ACTIVE") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been disabled or suspended. Please contact customer support.",
+      });
+    }
+
     const token = createAuthToken(user);
 
     return res.status(200).json({
@@ -268,6 +277,15 @@ export const googleLogin = async (req, res) => {
           role: "customer",
         });
       }
+    }
+
+    // Check account status
+    const status = user.accountStatus || "ACTIVE";
+    if (status !== "ACTIVE") {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been disabled or suspended. Please contact customer support.",
+      });
     }
 
     const token = createAuthToken(user);
