@@ -19,6 +19,19 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
 
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["ACTIVE", "DRAFT"],
+      default: "ACTIVE",
+      trim: true,
+    },
+
     image: {
       type: String,
     },

@@ -7,6 +7,8 @@ export const createProduct = async (req, res) => {
       name,
       brand,
       category,
+      description,
+      status,
       originalPrice,
       discountPercent = 0,
       offerType = "NONE",
@@ -15,6 +17,23 @@ export const createProduct = async (req, res) => {
 
     if (!name || !category || !originalPrice) {
       return res.status(400).json({ message: "Required fields missing" });
+    }
+
+    const origPriceNum = Number(originalPrice);
+    const discPercentNum = Number(discountPercent) || 0;
+    const stockNum = Number(stock) || 0;
+
+    if (origPriceNum < 0) {
+      return res.status(400).json({ message: "Original price cannot be negative" });
+    }
+    if (discPercentNum < 0 || discPercentNum > 100) {
+      return res.status(400).json({ message: "Discount percent must be between 0 and 100" });
+    }
+    if (stockNum < 0) {
+      return res.status(400).json({ message: "Stock cannot be negative" });
+    }
+    if (status && status !== "ACTIVE" && status !== "DRAFT") {
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     if (!req.files || req.files.length === 0) {
@@ -26,20 +45,22 @@ export const createProduct = async (req, res) => {
     // 🔹 Collect image URLs from uploaded files
     const imageUrls = req.files.map((file) => file.path);
 
-    // 🔹 Calculate final price
-    const finalPrice = originalPrice - (originalPrice * discountPercent) / 100;
+    // 🔹 Calculate final price safely
+    const finalPrice = Math.max(0, origPriceNum - (origPriceNum * discPercentNum) / 100);
 
     const product = new Product({
       name,
       brand,
       category,
-      originalPrice,
-      discountPercent,
+      description: description || "",
+      status: status || "ACTIVE",
+      originalPrice: origPriceNum,
+      discountPercent: discPercentNum,
       finalPrice,
       offerType,
       images: imageUrls,
       image: imageUrls[0], // Keep for backward compatibility
-      stock: Number(stock) || 0,
+      stock: stockNum,
     });
 
     await product.save();
@@ -52,6 +73,30 @@ export const createProduct = async (req, res) => {
 // GET all products
 export const getProducts = async (req, res) => {
   try {
+    const { page, limit } = req.query;
+
+    if (page || limit) {
+      const pageNum = Math.max(1, parseInt(page, 10) || 1);
+      const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+      const skip = (pageNum - 1) * limitNum;
+
+      const [products, total] = await Promise.all([
+        Product.find().sort({ createdAt: -1 }).skip(skip).limit(limitNum),
+        Product.countDocuments(),
+      ]);
+
+      return res.json({
+        products,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    // Backward compatible standard request
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
@@ -71,26 +116,49 @@ export const updateProduct = async (req, res) => {
       name,
       brand,
       category,
+      description,
+      status,
       originalPrice,
-      discountPercent = 0,
-      offerType = "NONE",
+      discountPercent,
+      offerType,
       stock,
     } = req.body;
 
-    // Calculate final price
-    const finalPrice = originalPrice - (originalPrice * discountPercent) / 100;
+    const origPriceNum = originalPrice !== undefined ? Number(originalPrice) : product.originalPrice;
+    const discPercentNum = discountPercent !== undefined ? Number(discountPercent) : product.discountPercent;
+    let stockNum = product.stock;
+    if (stock !== undefined) {
+      stockNum = Number(stock) || 0;
+    }
+
+    if (origPriceNum < 0) {
+      return res.status(400).json({ message: "Original price cannot be negative" });
+    }
+    if (discPercentNum < 0 || discPercentNum > 100) {
+      return res.status(400).json({ message: "Discount percent must be between 0 and 100" });
+    }
+    if (stockNum < 0) {
+      return res.status(400).json({ message: "Stock cannot be negative" });
+    }
+    if (status && status !== "ACTIVE" && status !== "DRAFT") {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    // Calculate final price safely
+    const finalPrice = Math.max(0, origPriceNum - (origPriceNum * discPercentNum) / 100);
 
     // Update fields
-    product.name = name || product.name;
-    product.brand = brand || product.brand;
-    product.category = category || product.category;
-    product.originalPrice = originalPrice || product.originalPrice;
-    product.discountPercent = discountPercent;
+    if (name) product.name = name;
+    if (brand !== undefined) product.brand = brand;
+    if (category) product.category = category;
+    if (description !== undefined) product.description = description;
+    if (status) product.status = status;
+    if (offerType) product.offerType = offerType;
+
+    product.originalPrice = origPriceNum;
+    product.discountPercent = discPercentNum;
     product.finalPrice = finalPrice;
-    product.offerType = offerType;
-    if (typeof stock !== "undefined") {
-      product.stock = Number(stock) || 0;
-    }
+    product.stock = stockNum;
 
     if (req.files && req.files.length > 0) {
       const imageUrls = req.files.map((file) => file.path);
