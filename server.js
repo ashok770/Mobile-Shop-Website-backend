@@ -118,6 +118,13 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
 
+  if (err.name === "CastError") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Product ID format",
+    });
+  }
+
   if (err.message === "Not allowed by CORS") {
     return res
       .status(403)

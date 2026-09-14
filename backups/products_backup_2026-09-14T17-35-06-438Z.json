@@ -1,0 +1,390 @@
+[
+  {
+    "_id": {
+      "$oid": "6970e451b5518ebb5a473ee5"
+    },
+    "name": "Samsung Galaxy S24 Ultra Price, Full Specifications, Comparisons",
+    "brand": "Samsung",
+    "category": "mobile",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060372/mobile-shop/products/co5za4q5q0ynm38xnlty.png",
+    "originalPrice": 12000,
+    "discountPercent": 10,
+    "finalPrice": 10800,
+    "stock": 0,
+    "offerType": "NONE",
+    "createdAt": {
+      "$date": "2026-01-21T14:36:01.117Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T13:01:43.858Z"
+    },
+    "__v": 2,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060372/mobile-shop/products/co5za4q5q0ynm38xnlty.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696e6598ca4e181add3c7504"
+    },
+    "name": "iPhone 13 Edge To Edge Tempered Glass Screen Protector",
+    "price": 1000,
+    "category": "accessory",
+    "brand": "Apple",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768822848/mobile-shop/products/jzwvqklgcouvqt1yvxl6.png",
+    "createdAt": {
+      "$date": "2026-01-19T17:10:48.340Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:42:44.493Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 1000,
+    "offerType": "NONE",
+    "originalPrice": 1000,
+    "stock": 3,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768822848/mobile-shop/products/jzwvqklgcouvqt1yvxl6.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696d1a7ee024c4691a8ba5e8"
+    },
+    "name": "Redmi Note 14 Pro 5G",
+    "price": 12345,
+    "category": "mobile",
+    "brand": "Redmi",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738086/mobile-shop/products/z74jgcn8wvfqntrsixqz.png",
+    "createdAt": {
+      "$date": "2026-01-18T17:38:06.177Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:42:58.047Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 12345,
+    "offerType": "NONE",
+    "originalPrice": 12345,
+    "stock": 10,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738086/mobile-shop/products/z74jgcn8wvfqntrsixqz.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696ca817cbba8ab417188b19"
+    },
+    "name": "Earbuds",
+    "price": 1000,
+    "category": "accessory",
+    "brand": "Boult",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768709841/mobile-shop/products/pn39xciogmxntfsv82f4.png",
+    "createdAt": {
+      "$date": "2026-01-18T09:29:59.945Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-09T05:47:52.253Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 1000,
+    "offerType": "NONE",
+    "originalPrice": 1000,
+    "stock": 3,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768709841/mobile-shop/products/pn39xciogmxntfsv82f4.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696d172e76c3ed204a38b577"
+    },
+    "name": "iPhone 13 Clear Case with MagSafe",
+    "price": 24000,
+    "category": "accessory",
+    "brand": "Apple",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737266/mobile-shop/products/zcylk7kfhwf8f0savkla.png",
+    "createdAt": {
+      "$date": "2026-01-18T17:23:58.974Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:43:19.195Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 24000,
+    "offerType": "NONE",
+    "originalPrice": 24000,
+    "stock": 5,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737266/mobile-shop/products/zcylk7kfhwf8f0savkla.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696f748daf6a662af90903c9"
+    },
+    "name": "Zeblaze Vibe 7 Pro",
+    "brand": "Color Family",
+    "category": "accessory",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892214/mobile-shop/products/vemyaj3tkw3i2cy5nuda.png",
+    "originalPrice": 9999,
+    "discountPercent": 46,
+    "finalPrice": 5399.46,
+    "offerType": "BUY_1_GET_1",
+    "createdAt": {
+      "$date": "2026-01-20T12:26:53.636Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T09:50:42.377Z"
+    },
+    "__v": 0,
+    "stock": 4,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892214/mobile-shop/products/vemyaj3tkw3i2cy5nuda.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "6968a7c736426bd697931c17"
+    },
+    "name": "motorala",
+    "price": 21000,
+    "category": "mobile",
+    "brand": "Motorola",
+    "createdAt": {
+      "$date": "2026-01-15T08:39:35.900Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-09T05:44:43.976Z"
+    },
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715235/mobile-shop/products/k3x0djcxyx8bqvfac7if.png",
+    "discountPercent": 0,
+    "finalPrice": 21000,
+    "offerType": "NONE",
+    "originalPrice": 21000,
+    "stock": 0,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715235/mobile-shop/products/k3x0djcxyx8bqvfac7if.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696d1a31e024c4691a8ba5e5"
+    },
+    "name": "Samsung Galaxy S24 Ultra Price, Full Specifications, Comparisons",
+    "price": 12000,
+    "category": "mobile",
+    "brand": "Samsung",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738010/mobile-shop/products/tvleujqa7gztdxormz25.png",
+    "createdAt": {
+      "$date": "2026-01-18T17:36:49.629Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:43:07.601Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 12000,
+    "offerType": "NONE",
+    "originalPrice": 12000,
+    "stock": 4,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738010/mobile-shop/products/tvleujqa7gztdxormz25.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696d16dc76c3ed204a38b572"
+    },
+    "name": "Type C Android Charger 25W, 2-Pack USB C Wall Charger Block, Super Fast",
+    "price": 1000,
+    "category": "accessory",
+    "brand": "Samsung",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737157/mobile-shop/products/ogil3nizo26oyzfdnphu.png",
+    "createdAt": {
+      "$date": "2026-01-18T17:22:36.889Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:43:44.848Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 1000,
+    "offerType": "NONE",
+    "originalPrice": 1000,
+    "stock": 6,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737157/mobile-shop/products/ogil3nizo26oyzfdnphu.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696d082add5f66617eda4a3f"
+    },
+    "name": "Iphone 13",
+    "price": 25000,
+    "category": "mobile",
+    "brand": "Apple",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768733394/mobile-shop/products/juzxogygucmqpbfjy4s4.png",
+    "createdAt": {
+      "$date": "2026-01-18T16:19:54.031Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T09:50:42.140Z"
+    },
+    "__v": 0,
+    "discountPercent": 0,
+    "finalPrice": 25000,
+    "offerType": "NONE",
+    "originalPrice": 25000,
+    "stock": 5,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768733394/mobile-shop/products/juzxogygucmqpbfjy4s4.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696f76e24475d964404ccfde"
+    },
+    "name": "Redmi Note 8 pro",
+    "brand": "Redmi",
+    "category": "mobile",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892811/mobile-shop/products/oqphawko6r0umr3uqxgb.png",
+    "originalPrice": 10000,
+    "discountPercent": 25,
+    "finalPrice": 7500,
+    "offerType": "DAILY_SPECIAL",
+    "createdAt": {
+      "$date": "2026-01-20T12:36:50.745Z"
+    },
+    "updatedAt": {
+      "$date": "2026-08-04T13:29:02.313Z"
+    },
+    "__v": 0,
+    "stock": 2,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892811/mobile-shop/products/oqphawko6r0umr3uqxgb.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "696f38bc81b7b50f2b2175f6"
+    },
+    "name": "IPHONE 14 PRO MAX SUPER D TAMPAD GLASS",
+    "brand": "Apple",
+    "category": "accessory",
+    "originalPrice": 450,
+    "discountPercent": 29,
+    "finalPrice": 319.5,
+    "offerType": "MEGA_FLASH_SALE",
+    "createdAt": {
+      "$date": "2026-01-20T08:11:40.538Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-28T18:03:25.564Z"
+    },
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768883966/mobile-shop/products/bxtkabb6jzulzdasfjku.png",
+    "stock": 4,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768883966/mobile-shop/products/bxtkabb6jzulzdasfjku.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "6968a39f36426bd697931bfc"
+    },
+    "name": "Color Fits 2",
+    "price": 2000,
+    "category": "accessory",
+    "brand": "Noise",
+    "createdAt": {
+      "$date": "2026-01-15T08:21:51.105Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-21T14:44:41.645Z"
+    },
+    "__v": 0,
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715283/mobile-shop/products/fbrbytkpqxrjj8pl694w.png",
+    "discountPercent": 0,
+    "finalPrice": 2000,
+    "offerType": "NONE",
+    "originalPrice": 2000,
+    "stock": 5,
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715283/mobile-shop/products/fbrbytkpqxrjj8pl694w.png"
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "697206b686225c53c38344ba"
+    },
+    "name": "T800 ULTRA SMART WATCH",
+    "brand": "Noise",
+    "category": "accessory",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060697/mobile-shop/products/nznu9awmr29mqlvwpcpi.png",
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060697/mobile-shop/products/nznu9awmr29mqlvwpcpi.png",
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060702/mobile-shop/products/y9catjwxd5fc5gp0ecro.png",
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060702/mobile-shop/products/lbmix1qh1bvrt6szlqro.png"
+    ],
+    "originalPrice": 5000,
+    "discountPercent": 15,
+    "finalPrice": 4250,
+    "stock": 0,
+    "offerType": "DAILY_SPECIAL",
+    "createdAt": {
+      "$date": "2026-01-22T11:15:02.774Z"
+    },
+    "updatedAt": {
+      "$date": "2026-01-22T19:01:41.304Z"
+    },
+    "__v": 0,
+    "status": "ACTIVE"
+  },
+  {
+    "_id": {
+      "$oid": "6aa1a2b62b53938840439be3"
+    },
+    "name": "iphone 7e",
+    "brand": "Apple",
+    "category": "mobile",
+    "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977845/mobile-shop/products/dn8ecr2lyqdpel9pmwff.png",
+    "images": [
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977845/mobile-shop/products/dn8ecr2lyqdpel9pmwff.png",
+      "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977842/mobile-shop/products/vk2h9g97pi9kj9rwllak.png"
+    ],
+    "originalPrice": 2000,
+    "discountPercent": 50,
+    "finalPrice": 1000,
+    "stock": 5,
+    "offerType": "MEGA_FLASH_SALE",
+    "createdAt": {
+      "$date": "2026-09-09T18:17:26.478Z"
+    },
+    "updatedAt": {
+      "$date": "2026-09-14T07:35:49.710Z"
+    },
+    "__v": 0,
+    "description": "",
+    "status": "DRAFT"
+  }
+]

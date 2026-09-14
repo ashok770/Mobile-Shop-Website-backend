@@ -2,33 +2,21 @@ import express from "express";
 import {
   createProduct,
   getProducts,
+  getOfferProducts,
   getProductById,
   updateProduct,
   deleteProduct,
 } from "../controllers/productController.js";
 
-import protect, { adminOnly, adminProtect } from "../middleware/authMiddleware.js";
+import protect, { adminOnly, adminProtect, optionalAdmin } from "../middleware/authMiddleware.js";
 import upload from "../middleware/upload.js";
-import Product from "../models/Product.js";
 
 const router = express.Router();
 
-// Public
-router.get("/", getProducts);
-
-// GET products by offer
-router.get("/offers/:type", async (req, res) => {
-  const { type } = req.params;
-
-  const products = await Product.find({
-    offerType: type,
-  });
-
-  res.json(products);
-});
-
-// GET single product by ID
-router.get("/:id", getProductById);
+// Public (with optional admin draft detection)
+router.get("/", optionalAdmin, getProducts);
+router.get("/offers/:type", optionalAdmin, getOfferProducts);
+router.get("/:id", optionalAdmin, getProductById);
 
 // Admin (adminProtect + adminOnly)
 router.post("/", adminProtect, adminOnly, upload.array("images", 5), createProduct);

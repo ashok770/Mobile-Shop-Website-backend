@@ -117,3 +117,33 @@ export const adminOnly = (req, res, next) => {
     message: "Admin access only.",
   });
 };
+
+export const optionalAdmin = async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      if (
+        decoded.type === "admin" &&
+        decoded.tokenVersion !== undefined &&
+        decoded.tokenVersion !== null
+      ) {
+        const admin = await Admin.findById(decoded.id).select("-password");
+        if (admin) {
+          const currentVersion = admin.tokenVersion ?? 0;
+          if (decoded.tokenVersion === currentVersion) {
+            req.admin = admin;
+          }
+        }
+      }
+    } catch {
+      // Silently ignore invalid or expired admin tokens for optional auth
+    }
+  }
+  return next();
+};
+

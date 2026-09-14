@@ -1,5 +1,9 @@
+import mongoose from "mongoose";
 import Product from "../models/Product.js";
+import Order from "../models/Order.js";
 import cloudinary from "../config/cloudinary.js";
+import { getSafeCleanupCandidates, executeCloudinaryCleanup } from "../utils/cloudinaryHelper.js";
+
 // CREATE product
 export const createProduct = async (req, res) => {
   try {
@@ -45,8 +49,11 @@ export const createProduct = async (req, res) => {
     // 🔹 Collect image URLs from uploaded files
     const imageUrls = req.files.map((file) => file.path);
 
-    // 🔹 Calculate final price safely
-    const finalPrice = Math.max(0, origPriceNum - (origPriceNum * discPercentNum) / 100);
+    // 🔹 Calculate final price safely (2 decimal places precision)
+    const finalPrice = Math.max(
+      0,
+      Math.round((origPriceNum - (origPriceNum * discPercentNum) / 100) * 100) / 100
+    );
 
     const product = new Product({
       name,
@@ -75,34 +82,86 @@ export const getProducts = async (req, res) => {
   try {
     const { page, limit, search, brand, category, status, offerType, stock } = req.query;
 
+    // Parameter normalization (handles duplicate query array arguments safely)
+    const searchVal = Array.isArray(search) ? search[0] : search;
+    const brandVal = Array.isArray(brand) ? brand[0] : brand;
+    const categoryVal = Array.isArray(category) ? category[0] : category;
+    const statusVal = Array.isArray(status) ? status[0] : status;
+    const offerTypeVal = Array.isArray(offerType) ? offerType[0] : offerType;
+    const stockVal = Array.isArray(stock) ? stock[0] : stock;
+
     let filter = {};
 
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { brand: { $regex: search, $options: "i" } },
-      ];
-    }
-    if (brand) filter.brand = brand;
-    if (category) filter.category = category;
-    if (status) filter.status = status;
-    if (offerType) filter.offerType = offerType;
-    
-    if (stock) {
-      if (stock === "in_stock") filter.stock = { $gt: 5 };
-      else if (stock === "low_stock") filter.stock = { $gt: 0, $lte: 5 };
-      else if (stock === "out_of_stock") filter.stock = 0;
+    // Search sanitization against regex injection / ReDoS
+    if (typeof searchVal === "string" && searchVal.trim().length > 0) {
+      const trimmed = searchVal.trim().slice(0, 100); // Limit search term length to 100 chars
+      const sanitized = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (sanitized.length > 0) {
+        filter.$or = [
+          { name: { $regex: sanitized, $options: "i" } },
+          { brand: { $regex: sanitized, $options: "i" } },
+        ];
+      }
     }
 
-    if (page || limit) {
-      const pageNum = Math.max(1, parseInt(page, 10) || 1);
-      const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    if (brandVal && typeof brandVal === "string") {
+      filter.brand = brandVal;
+    }
+
+    if (categoryVal && typeof categoryVal === "string") {
+      filter.category = categoryVal.toLowerCase();
+    }
+
+    // Draft visibility protection: non-admins are strictly locked to ACTIVE products
+    const isAdmin = Boolean(req.admin);
+    if (!isAdmin) {
+      filter.status = "ACTIVE";
+    } else {
+      if (statusVal && statusVal !== "ALL") {
+        filter.status = statusVal;
+      }
+    }
+
+    if (offerTypeVal && typeof offerTypeVal === "string") {
+      const ALLOWED_OFFERS = ["NONE", "MEGA_FLASH_SALE", "BUY_1_GET_1", "DAILY_SPECIAL"];
+      if (!ALLOWED_OFFERS.includes(offerTypeVal)) {
+        return res.status(400).json({ message: "Invalid offer type" });
+      }
+      filter.offerType = offerTypeVal;
+    }
+
+    if (stockVal && typeof stockVal === "string") {
+      if (stockVal === "in_stock") filter.stock = { $gt: 5 };
+      else if (stockVal === "low_stock") filter.stock = { $gt: 0, $lte: 5 };
+      else if (stockVal === "out_of_stock") filter.stock = 0;
+    }
+
+    // Handle pagination if page or limit query param is present
+    if (page !== undefined || limit !== undefined) {
+      const rawPage = parseInt(Array.isArray(page) ? page[0] : page, 10);
+      const pageNum = isNaN(rawPage) || rawPage <= 0 ? 1 : rawPage;
+
+      const rawLimit = parseInt(Array.isArray(limit) ? limit[0] : limit, 10);
+      const limitNum = isNaN(rawLimit) || rawLimit <= 0 ? 20 : Math.min(100, rawLimit);
+
+      const total = await Product.countDocuments(filter);
+      const totalPages = Math.ceil(total / limitNum) || 1;
+
+      // Excessive page optimization: if requested page exceeds totalPages, return empty array safely
+      if (pageNum > totalPages) {
+        return res.json({
+          products: [],
+          pagination: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            totalPages,
+          },
+        });
+      }
+
       const skip = (pageNum - 1) * limitNum;
-
-      const [products, total] = await Promise.all([
-        Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limitNum),
-        Product.countDocuments(filter),
-      ]);
+      const products = await Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limitNum);
 
       return res.json({
         products,
@@ -110,12 +169,42 @@ export const getProducts = async (req, res) => {
           page: pageNum,
           limit: limitNum,
           total,
-          totalPages: Math.ceil(total / limitNum),
+          totalPages,
         },
       });
     }
 
-    // Backward compatible standard request
+    // Backward compatible standard request (unpaginated raw array)
+    const products = await Product.find(filter).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET products by offer type
+export const getOfferProducts = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { status } = req.query;
+    const ALLOWED_OFFERS = ["NONE", "MEGA_FLASH_SALE", "BUY_1_GET_1", "DAILY_SPECIAL"];
+
+    if (!ALLOWED_OFFERS.includes(type)) {
+      return res.status(400).json({ message: "Invalid offer type" });
+    }
+
+    const isAdmin = Boolean(req.admin);
+    const filter = { offerType: type };
+
+    if (!isAdmin) {
+      filter.status = "ACTIVE";
+    } else {
+      const statusVal = Array.isArray(status) ? status[0] : status;
+      if (statusVal && statusVal !== "ALL") {
+        filter.status = statusVal;
+      }
+    }
+
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
@@ -126,8 +215,14 @@ export const getProducts = async (req, res) => {
 // GET product by ID
 export const getProductById = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid Product ID format" });
+    }
+
     const product = await Product.findById(req.params.id);
-    if (!product) {
+    const isAdmin = Boolean(req.admin);
+
+    if (!product || (!isAdmin && product.status !== "ACTIVE")) {
       return res.status(404).json({ message: "Product not found" });
     }
     res.json(product);
@@ -139,6 +234,10 @@ export const getProductById = async (req, res) => {
 // UPDATE product
 export const updateProduct = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid Product ID format" });
+    }
+
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -176,8 +275,11 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ message: "Invalid status" });
     }
 
-    // Calculate final price safely
-    const finalPrice = Math.max(0, origPriceNum - (origPriceNum * discPercentNum) / 100);
+    // Calculate final price safely (2 decimal places precision)
+    const finalPrice = Math.max(
+      0,
+      Math.round((origPriceNum - (origPriceNum * discPercentNum) / 100) * 100) / 100
+    );
 
     // Update fields
     if (name) product.name = name;
@@ -200,7 +302,7 @@ export const updateProduct = async (req, res) => {
       } else if (typeof req.body.retainedImages === "string") {
         try {
           retainedImages = JSON.parse(req.body.retainedImages);
-        } catch (e) {
+        } catch {
           retainedImages = [req.body.retainedImages];
         }
       }
@@ -218,10 +320,26 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ message: "Maximum 5 images allowed" });
     }
 
+    // Capture old images before updating product document
+    const oldImageUrls = [...(product.images || []), product.image].filter(Boolean);
+
     product.images = finalImages;
     product.image = finalImages[0];
 
     await product.save();
+
+    // Compute removed image URLs for cleanup
+    const removedUrls = oldImageUrls.filter((url) => !finalImages.includes(url));
+    if (removedUrls.length > 0) {
+      getSafeCleanupCandidates(removedUrls, product._id)
+        .then(({ candidates, skippedReferenced, skippedInvalid }) => {
+          return executeCloudinaryCleanup(candidates, { skippedReferenced, skippedInvalid });
+        })
+        .catch((err) => {
+          console.error("[Cloudinary Edit Cleanup Non-Blocking Error]:", err);
+        });
+    }
+
     res.json(product);
   } catch (error) {
     console.error(error);
@@ -229,10 +347,39 @@ export const updateProduct = async (req, res) => {
   }
 };
 
-// ✅ DELETE product (THIS WAS MISSING AT RUNTIME)
+// DELETE product
 export const deleteProduct = async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid Product ID format" });
+    }
+
+    // 1. Fetch the product
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // 2. Order Reference Check (C5.5) - Block deletion if product has order history
+    const hasOrderHistory = await Order.exists({ "items.productId": product._id });
+    if (hasOrderHistory) {
+      return res.status(400).json({
+        message: "This product has order history and cannot be deleted. Change its status to Draft instead.",
+      });
+    }
+
+    // 3. Collect, validate, and compute safe cleanup candidates BEFORE deleting MongoDB product
+    const oldUrls = [...(product.images || []), product.image].filter(Boolean);
+    const { candidates, skippedReferenced, skippedInvalid } = await getSafeCleanupCandidates(oldUrls, product._id);
+
+    // 4. Delete the MongoDB product document
     await Product.findByIdAndDelete(req.params.id);
+
+    // 5. Attempt Cloudinary cleanup for precomputed candidates & log failure without rolling back DB deletion
+    executeCloudinaryCleanup(candidates, { skippedReferenced, skippedInvalid }).catch((err) => {
+      console.error("[Cloudinary Delete Cleanup Non-Blocking Error]:", err);
+    });
+
     res.json({ message: "Product deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
