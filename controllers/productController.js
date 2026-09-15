@@ -123,11 +123,15 @@ export const getProducts = async (req, res) => {
     }
 
     if (offerTypeVal && typeof offerTypeVal === "string") {
-      const ALLOWED_OFFERS = ["NONE", "MEGA_FLASH_SALE", "BUY_1_GET_1", "DAILY_SPECIAL"];
-      if (!ALLOWED_OFFERS.includes(offerTypeVal)) {
-        return res.status(400).json({ message: "Invalid offer type" });
+      if (offerTypeVal === "PROMOTED") {
+        filter.offerType = { $ne: "NONE" };
+      } else {
+        const ALLOWED_OFFERS = ["NONE", "MEGA_FLASH_SALE", "BUY_1_GET_1", "DAILY_SPECIAL"];
+        if (!ALLOWED_OFFERS.includes(offerTypeVal)) {
+          return res.status(400).json({ message: "Invalid offer type" });
+        }
+        filter.offerType = offerTypeVal;
       }
-      filter.offerType = offerTypeVal;
     }
 
     if (stockVal && typeof stockVal === "string") {
@@ -344,6 +348,79 @@ export const updateProduct = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Product update failed" });
+  }
+};
+
+// GET offer summary counts
+export const getOfferSummary = async (req, res) => {
+  try {
+    const matchStage = req.user?.isAdmin
+      ? { status: { $in: ["ACTIVE", "DRAFT"] } }
+      : { status: "ACTIVE" };
+
+    const summary = await Product.aggregate([
+      { $match: matchStage },
+      { $group: { _id: "$offerType", count: { $sum: 1 } } }
+    ]);
+
+    const counts = {
+      ALL: 0,
+      MEGA_FLASH_SALE: 0,
+      BUY_1_GET_1: 0,
+      DAILY_SPECIAL: 0,
+      NONE: 0,
+    };
+
+    summary.forEach(({ _id, count }) => {
+      if (_id && counts[_id] !== undefined) {
+        counts[_id] = count;
+      }
+      if (_id !== "NONE") {
+        counts.ALL += count;
+      }
+    });
+
+    res.json(counts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PATCH bulk update offer
+export const bulkUpdateOffer = async (req, res) => {
+  try {
+    const { productIds, offerType } = req.body;
+
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ message: "productIds must be a non-empty array" });
+    }
+
+    if (productIds.length > 200) {
+      return res.status(400).json({ message: "Batch limit is 200 products" });
+    }
+
+    const ALLOWED_OFFERS = ["NONE", "MEGA_FLASH_SALE", "BUY_1_GET_1", "DAILY_SPECIAL"];
+    if (!ALLOWED_OFFERS.includes(offerType)) {
+      return res.status(400).json({ message: "Invalid offerType" });
+    }
+
+    const validIds = productIds.every((id) => mongoose.Types.ObjectId.isValid(id));
+    if (!validIds) {
+      return res.status(400).json({ message: "One or more product IDs are invalid" });
+    }
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds } },
+      { $set: { offerType } }
+    );
+
+    res.json({
+      message: "Products updated successfully",
+      matchedCount: result.matchedCount,
+      modifiedCount: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

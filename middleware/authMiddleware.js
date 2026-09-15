@@ -156,3 +156,10 @@ export const optionalAdmin = async (req, res, next) => {
   return next();
 };
 
+export const adminOrProtect = (req, res, next) => {
+  if (req.admin) {
+    return next();
+  }
+  return protect(req, res, next);
+};
+

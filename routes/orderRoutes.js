@@ -7,7 +7,7 @@ import {
   updateOrderStatus,
   getOrderStats,
 } from "../controllers/orderController.js";
-import protect, { adminOnly, adminProtect, optionalAdmin } from "../middleware/authMiddleware.js";
+import protect, { adminOnly, adminProtect, optionalAdmin, adminOrProtect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post("/", protect, createOrder);
 router.get("/my-orders", protect, getMyOrders);
 
 // GET single order (Customer own order or Admin)
-router.get("/:id", optionalAdmin, protect, getOrderById);
+router.get("/:id", optionalAdmin, adminOrProtect, getOrderById);
 
 // ===== Admin endpoints (adminProtect + adminOnly) =====
 
