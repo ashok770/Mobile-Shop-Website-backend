@@ -16,6 +16,7 @@ import chatbotRoutes from "./routes/chatRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import homepageRoutes from "./routes/homepageRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import adminCustomerRoutes from "./routes/adminCustomerRoutes.js";
@@ -100,6 +101,7 @@ app.use("/api/chat", chatbotRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/homepage", homepageRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/address", addressRoutes);
 
