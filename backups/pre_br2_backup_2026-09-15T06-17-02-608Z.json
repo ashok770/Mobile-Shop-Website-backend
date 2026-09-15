@@ -1,0 +1,634 @@
+{
+  "timestamp": "2026-09-15T06-17-02-608Z",
+  "counts": {
+    "products": 15,
+    "orders": 13,
+    "brands": 0
+  },
+  "products": [
+    {
+      "_id": "6970e451b5518ebb5a473ee5",
+      "name": "Samsung Galaxy S24 Ultra Price, Full Specifications, Comparisons",
+      "brand": "Samsung",
+      "category": "mobile",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060372/mobile-shop/products/co5za4q5q0ynm38xnlty.png",
+      "originalPrice": 12000,
+      "discountPercent": 10,
+      "finalPrice": 10800,
+      "stock": 2,
+      "offerType": "NONE",
+      "createdAt": "2026-01-21T14:36:01.117Z",
+      "updatedAt": "2026-09-15T04:37:44.409Z",
+      "__v": 2,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060372/mobile-shop/products/co5za4q5q0ynm38xnlty.png"
+      ],
+      "status": "ACTIVE",
+      "description": ""
+    },
+    {
+      "_id": "696e6598ca4e181add3c7504",
+      "name": "iPhone 13 Edge To Edge Tempered Glass Screen Protector",
+      "price": 1000,
+      "category": "accessory",
+      "brand": "Apple",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768822848/mobile-shop/products/jzwvqklgcouvqt1yvxl6.png",
+      "createdAt": "2026-01-19T17:10:48.340Z",
+      "updatedAt": "2026-01-21T14:42:44.493Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 1000,
+      "offerType": "NONE",
+      "originalPrice": 1000,
+      "stock": 3,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768822848/mobile-shop/products/jzwvqklgcouvqt1yvxl6.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696d1a7ee024c4691a8ba5e8",
+      "name": "Redmi Note 14 Pro 5G",
+      "price": 12345,
+      "category": "mobile",
+      "brand": "Redmi",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738086/mobile-shop/products/z74jgcn8wvfqntrsixqz.png",
+      "createdAt": "2026-01-18T17:38:06.177Z",
+      "updatedAt": "2026-09-14T18:35:19.924Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 12345,
+      "offerType": "NONE",
+      "originalPrice": 12345,
+      "stock": 13,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738086/mobile-shop/products/z74jgcn8wvfqntrsixqz.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696ca817cbba8ab417188b19",
+      "name": "Earbuds",
+      "price": 1000,
+      "category": "accessory",
+      "brand": "Boult",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768709841/mobile-shop/products/pn39xciogmxntfsv82f4.png",
+      "createdAt": "2026-01-18T09:29:59.945Z",
+      "updatedAt": "2026-08-09T05:47:52.253Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 1000,
+      "offerType": "NONE",
+      "originalPrice": 1000,
+      "stock": 3,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768709841/mobile-shop/products/pn39xciogmxntfsv82f4.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696d172e76c3ed204a38b577",
+      "name": "iPhone 13 Clear Case with MagSafe",
+      "price": 24000,
+      "category": "accessory",
+      "brand": "Apple",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737266/mobile-shop/products/zcylk7kfhwf8f0savkla.png",
+      "createdAt": "2026-01-18T17:23:58.974Z",
+      "updatedAt": "2026-01-21T14:43:19.195Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 24000,
+      "offerType": "NONE",
+      "originalPrice": 24000,
+      "stock": 5,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737266/mobile-shop/products/zcylk7kfhwf8f0savkla.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696f748daf6a662af90903c9",
+      "name": "Zeblaze Vibe 7 Pro",
+      "brand": "Color Family",
+      "category": "accessory",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892214/mobile-shop/products/vemyaj3tkw3i2cy5nuda.png",
+      "originalPrice": 9999,
+      "discountPercent": 46,
+      "finalPrice": 5399.46,
+      "offerType": "BUY_1_GET_1",
+      "createdAt": "2026-01-20T12:26:53.636Z",
+      "updatedAt": "2026-08-04T09:50:42.377Z",
+      "__v": 0,
+      "stock": 4,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892214/mobile-shop/products/vemyaj3tkw3i2cy5nuda.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "6968a7c736426bd697931c17",
+      "name": "motorala",
+      "price": 21000,
+      "category": "mobile",
+      "brand": "Motorola",
+      "createdAt": "2026-01-15T08:39:35.900Z",
+      "updatedAt": "2026-08-09T05:44:43.976Z",
+      "__v": 0,
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715235/mobile-shop/products/k3x0djcxyx8bqvfac7if.png",
+      "discountPercent": 0,
+      "finalPrice": 21000,
+      "offerType": "NONE",
+      "originalPrice": 21000,
+      "stock": 0,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715235/mobile-shop/products/k3x0djcxyx8bqvfac7if.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696d1a31e024c4691a8ba5e5",
+      "name": "Samsung Galaxy S24 Ultra Price, Full Specifications, Comparisons",
+      "price": 12000,
+      "category": "mobile",
+      "brand": "Samsung",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738010/mobile-shop/products/tvleujqa7gztdxormz25.png",
+      "createdAt": "2026-01-18T17:36:49.629Z",
+      "updatedAt": "2026-01-21T14:43:07.601Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 12000,
+      "offerType": "NONE",
+      "originalPrice": 12000,
+      "stock": 4,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768738010/mobile-shop/products/tvleujqa7gztdxormz25.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696d16dc76c3ed204a38b572",
+      "name": "Type C Android Charger 25W, 2-Pack USB C Wall Charger Block, Super Fast",
+      "price": 1000,
+      "category": "accessory",
+      "brand": "Samsung",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737157/mobile-shop/products/ogil3nizo26oyzfdnphu.png",
+      "createdAt": "2026-01-18T17:22:36.889Z",
+      "updatedAt": "2026-01-21T14:43:44.848Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 1000,
+      "offerType": "NONE",
+      "originalPrice": 1000,
+      "stock": 6,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768737157/mobile-shop/products/ogil3nizo26oyzfdnphu.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696d082add5f66617eda4a3f",
+      "name": "Iphone 13",
+      "price": 25000,
+      "category": "mobile",
+      "brand": "Apple",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768733394/mobile-shop/products/juzxogygucmqpbfjy4s4.png",
+      "createdAt": "2026-01-18T16:19:54.031Z",
+      "updatedAt": "2026-08-04T09:50:42.140Z",
+      "__v": 0,
+      "discountPercent": 0,
+      "finalPrice": 25000,
+      "offerType": "NONE",
+      "originalPrice": 25000,
+      "stock": 5,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768733394/mobile-shop/products/juzxogygucmqpbfjy4s4.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696f76e24475d964404ccfde",
+      "name": "Redmi Note 8 pro",
+      "brand": "Redmi",
+      "category": "mobile",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892811/mobile-shop/products/oqphawko6r0umr3uqxgb.png",
+      "originalPrice": 10000,
+      "discountPercent": 25,
+      "finalPrice": 7500,
+      "offerType": "DAILY_SPECIAL",
+      "createdAt": "2026-01-20T12:36:50.745Z",
+      "updatedAt": "2026-08-04T13:29:02.313Z",
+      "__v": 0,
+      "stock": 2,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768892811/mobile-shop/products/oqphawko6r0umr3uqxgb.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "696f38bc81b7b50f2b2175f6",
+      "name": "IPHONE 14 PRO MAX SUPER D TAMPAD GLASS",
+      "brand": "Apple",
+      "category": "accessory",
+      "originalPrice": 450,
+      "discountPercent": 29,
+      "finalPrice": 319.5,
+      "offerType": "MEGA_FLASH_SALE",
+      "createdAt": "2026-01-20T08:11:40.538Z",
+      "updatedAt": "2026-01-28T18:03:25.564Z",
+      "__v": 0,
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768883966/mobile-shop/products/bxtkabb6jzulzdasfjku.png",
+      "stock": 4,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768883966/mobile-shop/products/bxtkabb6jzulzdasfjku.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "6968a39f36426bd697931bfc",
+      "name": "Color Fits 2",
+      "price": 2000,
+      "category": "accessory",
+      "brand": "Noise",
+      "createdAt": "2026-01-15T08:21:51.105Z",
+      "updatedAt": "2026-01-21T14:44:41.645Z",
+      "__v": 0,
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715283/mobile-shop/products/fbrbytkpqxrjj8pl694w.png",
+      "discountPercent": 0,
+      "finalPrice": 2000,
+      "offerType": "NONE",
+      "originalPrice": 2000,
+      "stock": 5,
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715283/mobile-shop/products/fbrbytkpqxrjj8pl694w.png"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "_id": "697206b686225c53c38344ba",
+      "name": "T800 ULTRA SMART WATCH",
+      "brand": "Noise",
+      "category": "accessory",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060697/mobile-shop/products/nznu9awmr29mqlvwpcpi.png",
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060697/mobile-shop/products/nznu9awmr29mqlvwpcpi.png",
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060702/mobile-shop/products/y9catjwxd5fc5gp0ecro.png",
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1769060702/mobile-shop/products/lbmix1qh1bvrt6szlqro.png"
+      ],
+      "originalPrice": 5000,
+      "discountPercent": 15,
+      "finalPrice": 4250,
+      "stock": 1,
+      "offerType": "DAILY_SPECIAL",
+      "createdAt": "2026-01-22T11:15:02.774Z",
+      "updatedAt": "2026-09-15T04:37:28.292Z",
+      "__v": 0,
+      "status": "ACTIVE",
+      "description": ""
+    },
+    {
+      "_id": "6aa1a2b62b53938840439be3",
+      "name": "iphone 7e",
+      "brand": "Apple",
+      "category": "mobile",
+      "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977845/mobile-shop/products/dn8ecr2lyqdpel9pmwff.png",
+      "images": [
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977845/mobile-shop/products/dn8ecr2lyqdpel9pmwff.png",
+        "https://res.cloudinary.com/dtuocgtis/image/upload/v1788977842/mobile-shop/products/vk2h9g97pi9kj9rwllak.png"
+      ],
+      "originalPrice": 2000,
+      "discountPercent": 50,
+      "finalPrice": 1000,
+      "stock": 5,
+      "offerType": "MEGA_FLASH_SALE",
+      "createdAt": "2026-09-09T18:17:26.478Z",
+      "updatedAt": "2026-09-14T07:35:49.710Z",
+      "__v": 0,
+      "description": "",
+      "status": "DRAFT"
+    }
+  ],
+  "orders": [
+    {
+      "_id": "696d0121dd5f66617eda4a0b",
+      "customerName": "Aayush Tamata",
+      "phone": "9805790961",
+      "address": "kanchanpur sukasal-05",
+      "items": [
+        {
+          "name": "motorala",
+          "price": 21000,
+          "quantity": 1,
+          "_id": "696d0121dd5f66617eda4a0c"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-01-18T15:49:53.342Z",
+      "updatedAt": "2026-01-18T15:49:53.342Z",
+      "__v": 0
+    },
+    {
+      "_id": "697a4f6d4e8593d1c1c163f2",
+      "customerName": "Kajal Tamata",
+      "phone": "9704345761",
+      "address": "sukasal",
+      "items": [
+        {
+          "productId": "696f38bc81b7b50f2b2175f6",
+          "name": "IPHONE 14 PRO MAX SUPER D TAMPAD GLASS",
+          "price": 319.5,
+          "quantity": 1,
+          "_id": "697a4f6d4e8593d1c1c163f3"
+        },
+        {
+          "productId": "696f76e24475d964404ccfde",
+          "name": "Redmi Note 8 pro",
+          "price": 7500,
+          "quantity": 1,
+          "_id": "697a4f6d4e8593d1c1c163f4"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-01-28T18:03:25.772Z",
+      "updatedAt": "2026-01-28T18:03:25.772Z",
+      "__v": 0
+    },
+    {
+      "_id": "696776b8aa4bd07639d05957",
+      "customerName": "Ashok Tamata",
+      "phone": "7410557896",
+      "address": "Manhendrnagar-05",
+      "items": [
+        {
+          "name": "Selected Product",
+          "price": 0,
+          "quantity": 1,
+          "_id": "696776b8aa4bd07639d05958"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Delivered",
+      "createdAt": "2026-01-14T10:58:00.774Z",
+      "updatedAt": "2026-01-14T11:40:38.625Z",
+      "__v": 0
+    },
+    {
+      "_id": "696d0780dd5f66617eda4a29",
+      "customerName": "alex",
+      "phone": "5464987532",
+      "address": "ktm",
+      "items": [
+        {
+          "name": "motorala",
+          "price": 21000,
+          "quantity": 1,
+          "_id": "696d0780dd5f66617eda4a2a"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-01-18T16:17:04.404Z",
+      "updatedAt": "2026-01-18T16:17:04.404Z",
+      "__v": 0
+    },
+    {
+      "_id": "697a4c1b4e8593d1c1c1638f",
+      "customerName": "kabor Singh",
+      "phone": "3245659874",
+      "address": "sir eshawar college of engineering",
+      "items": [
+        {
+          "productId": "696f38bc81b7b50f2b2175f6",
+          "name": "IPHONE 14 PRO MAX SUPER D TAMPAD GLASS",
+          "price": 319.5,
+          "quantity": 1,
+          "_id": "697a4c1b4e8593d1c1c16390"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-01-28T17:49:15.037Z",
+      "updatedAt": "2026-01-28T17:49:15.037Z",
+      "__v": 0
+    },
+    {
+      "_id": "696770ebaa4bd07639d0594e",
+      "customerName": "Ashok",
+      "phone": "9876543210",
+      "address": "Main Market",
+      "items": [
+        {
+          "name": "Samsung Galaxy S21",
+          "price": 49999,
+          "quantity": 1,
+          "_id": "696770ebaa4bd07639d0594f"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Delivered",
+      "createdAt": "2026-01-14T10:33:15.914Z",
+      "updatedAt": "2026-01-14T10:43:19.786Z",
+      "__v": 0
+    },
+    {
+      "_id": "696cfb99846ef6dabee9e1dc",
+      "customerName": "Manish Tamata",
+      "phone": "9704543761",
+      "address": "Bhimdatta Nagar manahendranagar",
+      "items": [
+        {
+          "name": "motorala",
+          "price": 21000,
+          "quantity": 1,
+          "_id": "696cfb99846ef6dabee9e1dd"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-01-18T15:26:17.996Z",
+      "updatedAt": "2026-01-18T15:26:17.996Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a71b5f2c2fc03b021653ea7",
+      "customerName": "Ashok Tamata",
+      "phone": "07418557896",
+      "address": "Sri Eshwar College of Engineering",
+      "items": [
+        {
+          "productId": "6970e451b5518ebb5a473ee5",
+          "name": "Samsung Galaxy S24 Ultra Price, Full Specifications, Comparisons",
+          "price": 10800,
+          "quantity": 1,
+          "_id": "6a71b5f2c2fc03b021653ea8"
+        },
+        {
+          "productId": "696d082add5f66617eda4a3f",
+          "name": "Iphone 13",
+          "price": 25000,
+          "quantity": 1,
+          "_id": "6a71b5f2c2fc03b021653ea9"
+        },
+        {
+          "productId": "696f748daf6a662af90903c9",
+          "name": "Zeblaze Vibe 7 Pro",
+          "price": 5399.46,
+          "quantity": 1,
+          "_id": "6a71b5f2c2fc03b021653eaa"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-08-04T09:50:42.621Z",
+      "updatedAt": "2026-08-04T09:50:42.621Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a71e832a57c3c21f6ab4aab",
+      "customerName": "Ashok Tamata",
+      "phone": "+917418557896",
+      "address": "Sri Eshwar College of Engineering",
+      "items": [
+        {
+          "productId": "6968a7c736426bd697931c17",
+          "name": "motorala",
+          "price": 21000,
+          "quantity": 1,
+          "_id": "6a71e832a57c3c21f6ab4aac"
+        },
+        {
+          "productId": "696f76e24475d964404ccfde",
+          "name": "Redmi Note 8 pro",
+          "price": 7500,
+          "quantity": 1,
+          "_id": "6a71e832a57c3c21f6ab4aad"
+        }
+      ],
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Cancelled",
+      "createdAt": "2026-08-04T13:25:06.739Z",
+      "updatedAt": "2026-08-19T13:52:39.546Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a71e91ea57c3c21f6ab4ab1",
+      "customerName": "Ashok Tamata",
+      "phone": "+917418557896",
+      "address": "Sri Eshwar College of Engineering",
+      "items": [
+        {
+          "productId": "696f76e24475d964404ccfde",
+          "name": "Redmi Note 8 pro",
+          "price": 7500,
+          "quantity": 1,
+          "_id": "6a71e91ea57c3c21f6ab4ab2"
+        }
+      ],
+      "paymentMethod": "ONLINE",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-08-04T13:29:02.553Z",
+      "updatedAt": "2026-08-04T13:29:02.553Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a7813cc0d0895295b6e0587",
+      "user": "6a7810fa0d0895295b6e0527",
+      "customerName": "Ashok tamata",
+      "phone": "07418557896",
+      "address": "Boys Hostel Sir Eshwar College of Engineering",
+      "items": [
+        {
+          "productId": "6968a7c736426bd697931c17",
+          "name": "motorala",
+          "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768715235/mobile-shop/products/k3x0djcxyx8bqvfac7if.png",
+          "price": 21000,
+          "quantity": 1,
+          "_id": "6a7813cc0d0895295b6e0588"
+        }
+      ],
+      "subtotal": 21000,
+      "shippingCharge": 0,
+      "totalAmount": 21000,
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Pending",
+      "createdAt": "2026-08-09T05:44:44.224Z",
+      "updatedAt": "2026-08-09T05:44:44.224Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a7814889815cc10e8b7486b",
+      "user": "6a7810fa0d0895295b6e0527",
+      "customerName": "Ashok tamata",
+      "phone": "07418557896",
+      "address": "Boys Hostel Sir Eshwar College of Engineering",
+      "items": [
+        {
+          "productId": "696ca817cbba8ab417188b19",
+          "name": "Earbuds",
+          "image": "https://res.cloudinary.com/dtuocgtis/image/upload/v1768709841/mobile-shop/products/pn39xciogmxntfsv82f4.png",
+          "price": 1000,
+          "quantity": 1,
+          "_id": "6a7814889815cc10e8b7486c"
+        }
+      ],
+      "subtotal": 1000,
+      "shippingCharge": 0,
+      "totalAmount": 1000,
+      "paymentMethod": "COD",
+      "paymentStatus": "Paid",
+      "orderStatus": "Delivered",
+      "createdAt": "2026-08-09T05:47:52.383Z",
+      "updatedAt": "2026-08-09T18:02:52.612Z",
+      "__v": 0,
+      "deliveredAt": "2026-08-09T18:02:52.504Z",
+      "paidAt": "2026-08-09T18:02:52.611Z"
+    },
+    {
+      "_id": "6aa83b0756435ec8b424860f",
+      "user": "6aa83b0756435ec8b424860e",
+      "customerName": "Test Multi Valid Customer",
+      "phone": "9999999999",
+      "address": "123 Test St",
+      "items": [
+        {
+          "productId": "696d1a7ee024c4691a8ba5e8",
+          "name": "Redmi Note 14 Pro 5G",
+          "image": "",
+          "price": 100,
+          "quantity": 2,
+          "_id": "6aa83b0756435ec8b4248610"
+        },
+        {
+          "productId": "696d1a7ee024c4691a8ba5e8",
+          "name": "Redmi Note 14 Pro 5G",
+          "image": "",
+          "price": 100,
+          "quantity": 1,
+          "_id": "6aa83b0756435ec8b4248611"
+        }
+      ],
+      "subtotal": 300,
+      "shippingCharge": 49,
+      "totalAmount": 349,
+      "paymentMethod": "COD",
+      "paymentStatus": "Pending",
+      "orderStatus": "Cancelled",
+      "createdAt": "2026-09-14T18:20:55.346Z",
+      "updatedAt": "2026-09-14T18:20:55.652Z",
+      "__v": 0
+    }
+  ],
+  "brands": []
+}

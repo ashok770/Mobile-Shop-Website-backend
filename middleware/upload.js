@@ -18,7 +18,19 @@ const bannerStorage = new CloudinaryStorage({
   },
 });
 
+const brandStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "mobile-shop/brands",
+    allowed_formats: ["jpg", "jpeg", "png", "webp", "svg"],
+  },
+});
+
 export const uploadBanners = multer({ storage: bannerStorage });
+export const uploadBrandLogo = multer({
+  storage: brandStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 const upload = multer({ storage: productStorage });
 
 export default upload;
