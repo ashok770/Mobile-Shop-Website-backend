@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
-
+import Settings from "../models/Settings.js";
 const VALID_STATUSES = [
   "Pending",
   "Confirmed",
@@ -128,7 +128,8 @@ export const createOrder = async (req, res) => {
     }
 
     // Compute totals server-side
-    const shippingCharge = subtotal > 0 && subtotal < 500 ? 49 : 0;
+    const { freeShippingThreshold = 500, baseShippingCharge = 49 } = (await Settings.findOne({ key: "default" })) || {};
+const shippingCharge = subtotal > 0 && subtotal < freeShippingThreshold ? baseShippingCharge : 0;
     const totalAmount = Math.max(0, Math.round((subtotal + shippingCharge) * 100) / 100);
 
     // Reduce stock atomically with bulkWrite (single round-trip)

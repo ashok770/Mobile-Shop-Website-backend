@@ -22,6 +22,7 @@ import addressRoutes from "./routes/addressRoutes.js";
 import adminCustomerRoutes from "./routes/adminCustomerRoutes.js";
 import brandRoutes, { adminBrandRoutes } from "./routes/brandRoutes.js";
 import serviceRoutes, { adminServiceRoutes } from "./routes/serviceRoutes.js";
+import settingsRoutes, { adminSettingsRoutes } from "./routes/settingsRoutes.js";
 
 // Init app
 const app = express();
@@ -97,6 +98,7 @@ connectDB();
 // Routes
 app.use("/api/admin/brands", adminBrandRoutes);
 app.use("/api/admin/services", adminServiceRoutes);
+app.use("/api/admin/settings", adminSettingsRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/admin/customers", adminCustomerRoutes);
@@ -110,6 +112,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/homepage", homepageRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/address", addressRoutes);
+app.use("/api/settings", settingsRoutes);
 
 // Test route
 app.get("/", (req, res) => {
