@@ -21,6 +21,7 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import addressRoutes from "./routes/addressRoutes.js";
 import adminCustomerRoutes from "./routes/adminCustomerRoutes.js";
 import brandRoutes, { adminBrandRoutes } from "./routes/brandRoutes.js";
+import serviceRoutes, { adminServiceRoutes } from "./routes/serviceRoutes.js";
 
 // Init app
 const app = express();
@@ -95,7 +96,9 @@ connectDB();
 
 // Routes
 app.use("/api/admin/brands", adminBrandRoutes);
+app.use("/api/admin/services", adminServiceRoutes);
 app.use("/api/brands", brandRoutes);
+app.use("/api/services", serviceRoutes);
 app.use("/api/admin/customers", adminCustomerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
