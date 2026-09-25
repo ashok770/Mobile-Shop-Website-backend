@@ -61,7 +61,12 @@ const orderSchema = new mongoose.Schema(
             min: 1,
             default: 1,
           },
-        },
+          metadata: {
+            paidQuantity: { type: Number },
+            freeQuantity: { type: Number },
+            offerType: { type: String },
+          }
+        }
       ],
       required: [true, "At least one item is required"],
       validate: {

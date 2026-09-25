@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { computePromotionQuantities } from "../services/bogoHelper.js";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import Settings from "../models/Settings.js";
@@ -99,6 +100,14 @@ export const createOrder = async (req, res) => {
     let subtotal = 0;
 
     for (const item of items) {
+      // Validate quantity is a positive integer
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid quantity for product ${item.productId}`,
+        });
+      }
+
       const product = productMap.get(item.productId.toString());
 
       if (!product) {
@@ -108,7 +117,12 @@ export const createOrder = async (req, res) => {
         });
       }
 
-      if (product.stock < item.quantity) {
+      // Compute promotion quantities based on trusted product data
+      const promo = computePromotionQuantities(product, item.quantity);
+      const { paidQuantity, freeQuantity, physicalQuantity, offerType } = promo;
+
+      // Ensure sufficient stock for total physical quantity
+      if (product.stock < physicalQuantity) {
         return res.status(400).json({
           success: false,
           message: `Only ${product.stock} left for ${product.name}`,
@@ -116,14 +130,16 @@ export const createOrder = async (req, res) => {
       }
 
       const price = product.finalPrice;
-      subtotal += price * item.quantity;
+      // Subtotal reflects only paid units
+      subtotal += price * paidQuantity;
 
       orderItems.push({
         productId: product._id,
         name: product.name,
         image: product.image || "",
         price,
-        quantity: item.quantity,
+        quantity: physicalQuantity,
+        metadata: { paidQuantity, freeQuantity, offerType },
       });
     }
 
